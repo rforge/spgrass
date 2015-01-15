@@ -1,0 +1,74 @@
+Interface between GRASS geographical information system and R
+
+Interface between GRASS geographical information system and R, based on
+starting R from within the GRASS environment and chosen LOCATION_NAME
+and MAPSET. Wrapper and helper functions are provided for a range of R
+functions to match the interface metadata structures.
+
+This file is intended to clarify ownership and copyright: where
+possible individual files also carry brief copyright notices. 
+
+Copyrights
+==========
+
+File: kde2d.G.R contains modified versions of the kde2d() and
+bandwidth.nrd() functions in the MASS library, copyright 1994-9
+W.N.Venables & B.D.Ripley.
+
+File: krige.G.R contains a modified version of the prmat() in the spatial
+library, copyright 1994-9 W.N.Venables & B.D.Ripley.
+
+File: pcbs.txt contains data distributed with: Bailey, T. C., Gatrell,
+A. C. 1995 Interactive Spatial Data Analysis (Longman, Harlow), and is
+included here by permission of the authors.
+
+File: utm.maas.rda contains data from: Burrough, P. & McDonnell,
+R. (1998) Principles of geographical information systems, New York:
+Oxford, pp. 309--311, also distributed with Gstat (http://www.gstat.org),
+and originally taken from: Rikken, M.G.J., Van Rijn, R.P.G., 1993. Soil
+pollution with heavy metals -- An Inquiry into Spatial Variation,
+Cost of Mapping and the Risk evaluation of Copper, Cadmium, Lead and
+Zinc in the Floodplains of the Meuse West of Stein, The Netherlands.
+Doctoraalveldwerkverslag, Dept. of Physical Geography, Utrecht University.
+
+
+Files: src/gmeta.access.c, src/gmeta.c, src/include/grassR.h,
+src/rasteri.c, src/rastget.c, src/rastput.c, src/R_G_init.c,
+src/sitesget.c, src/sitesput.c, are copyright (c) 1998-2002 Roger
+S. Bivand and are subject to the licence at the foot of this file.
+
+The remaining files in src and src/include are copyright (c) various
+dates by the GRASS Development Team and are free software under
+the GNU General Public License (>=v2). Read the file COPYING that
+comes with GRASS for details; exceptions are the files from the R
+source distribution: src/include/zlib.h and src/include/zconf.h,
+which are Copyright (C) 1995-2002 Jean-loup Gailly and Mark Adler,
+file src/include/psignal.h, which is Copyright 1994-1999 The Downhill
+Project, and files src/include/rpc/*.h, which are Copyright (C) 1984,
+Sun Microsystems, Inc., and are as modified: RPC for the Windows NT
+Operating System 1993 by Martin F. Gergeleit.
+
+
+Licence
+=======
+
+    This is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+
+
+The file COPYING in the R top-level directory is a copy of the "GNU
+General Public License".
+
+Roger.Bivand@nhh.no
+

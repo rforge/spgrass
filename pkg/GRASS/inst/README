@@ -1,0 +1,138 @@
+Package: GRASS
+Version: 0.2-2
+Author: Interface functions by Roger Bivand <Roger.Bivand@nhh.no>, wrapper
+	and helper functions modified from various originals by interface 
+	author.
+	
+Description: Interface between GRASS geographical information system and R,
+	based on starting R from within the GRASS environment and chosen 
+	LOCATION and MAPSET. Wrapper and helper functions are provided for 
+	a range of R functions to match the interface metadata structures. 
+
+Note:	(0.2-2) simplified installation to eliminate dependence on GRASS
+	installed tree, by making compilation self-contained. Files from
+	grass*/src/libes/gis and header files, as well as header files from
+	the R src/extra directories (for zlib and xdr) included. libgis files
+	modified where necessary to accommodate MinGW differences.
+
+When the library is loaded, a check is run using the environment variable
+GISRC. Under Unix and Windows, it points to the file using the full path
+name, but under CygWin it may lack a prefix to the CygWin root, defined
+in cygpath --mixed form, such as "c:/cygwin". In this case, a warning will
+be issued, the string should be set using set.cygwinstring(<your cygwin root>),
+and GRASS.connect() re-run to ensure that the file named in GISRC is found
+correctly. See also the GRASS.connect() help page.
+
+> library(GRASS)
+No GRASS environment found
+If GRASS.connect() fails in this way and you are running under CygWin,
+please set the CygWin root file system prefix using: set.cygwinstring()
+Warning message:
+Failure opening GISRC file
+> set.cygwinstring("c:/cygwin")
+[1] "c:/cygwin"
+> GRASS.connect()
+GRASS environment variables in: c:/cygwin/home/rsb/.grassrc5
+> 
+
+	(0.2.1) provided compiled interface for sites; corrected interpreted
+	gmeta for lat/lon coordinates.
+
+	(0.1-10/11) Changes made to accommodate changes in R with respect to
+	function namespaces, and changes in which shell variables are set
+	in GRASS. Changes were also made to the install scripts.
+
+	(0.1-7/8) (release 8 tidies up minor incompatibilities with R 1.4.0)
+	These releases add quantization and colours support to the raster
+	interface from R to GRASS (rast.put()).
+
+	Remarks below about the use of "R CMD check" should be ignored -
+	the "check" script is now only intended for package writers and
+	maintainers - not users.
+
+	Installing continues to be done with R INSTALL GRASS_0.1-8.tar.gz.
+	There are a number of configure flags that may be used to help
+	the R install script find the GRASS libraries: they are
+
+	--configure-args=--grass5= (full path to your grass5 script)
+	--configure-args=--gmake5= (full path to your gmake5 script)
+	--configure-args=--zinclude= (full path to directory with zlib.h)
+	--configure-args=--zlib= (full path to directory with libz.a)
+	--configure-args=--interp (don't build compiled interface)
+
+--------------------------------------------------------------------
+
+	(0.1-6) Incompatibility between R 1.1.1 and 1.2.0 in compiled 
+	interface code - changes in memory management in R made changes in 
+	source code necessary. The configure script will also look for the 
+	include and library files in the GRASS install directory.
+
+	(0.1-5) Major modification to examples now using Burrough & McDonnell
+	Maas bank soil pollution data. Minor changes to interface functions
+	to catch infelicities. From version 0.1-5, this means that you
+	need to run R CMD check GRASS as:
+
+	R CMD check --vsize=16M GRASS
+
+	until R 1.2.0 changes the memory heap allocation mechanisms.
+	
+
+	-------------------------------
+
+	From version 0.1-4, changes have been made in gmeta(). The function
+	no longer returns the list xy with members east and north, nor obsno,
+	nor reverse. These are now available as access functions, to be called
+	on demand as east(G), north(G), obsno(G), and reverse(G), where
+	G is an object with class "grassmeta" returned by gmeta(). This
+	reduces the memory needs of "grassmeta" class objects by 24*Ncells
+	bytes, where Ncells=rows*columns in the GRASS raster database for the
+	current region.
+
+	From this version, installation will try to guess the location of
+	GRASS header and library files, but can chose to install interpreted:
+	R INSTALL --configure-args=--interp GRASS_0.1-4.tar.gz
+
+	The location of gmake5 can also be given:
+	R INSTALL --configure-args=--gmake5=<...> GRASS_0.1-4.tar.gz
+	when the package does not find it itself using which gmake5.
+
+	-------------------------------
+
+	From version 0.1-3, the interface includes compiled functions for 
+	gmeta(), rast.put(), and rast.get(). These link against the GRASS 
+	library libgis.a and require the include file gis.h.
+ 
+	These are available on systems - 
+	essentially only Unix/GNU Linux systems - on which GRASS has itself been
+	compiled, and are not included in GRASS binary distributions. A simple
+	configure script is used to look for the required files, searching first
+	for the gmake5 script, and next setting appropriate flags for compiling
+	and linking.
+
+	The speed-up from using compiled interface functions is at least an
+	order of magnitude, varying for transfer of category labels/factor 
+	levels and numeric/floating point layers. R factor levels can only be
+	moved to GRASS as category labels in the compiled version of rast.put().
+	There are detailed differences in the handling of factor levels/cate-
+	gory labels between the interpreted and compiled versions of rast.get().
+	
+	Care needs to be taken with R's assumptions about the factor and
+	ordered attributes - partly because R expects the factor values to
+	point to level array elements, which begin at 1, not 0 as in C (and
+	thus in the GRASS Categories structure. Running table() on the
+	ordered factor imported with interp=[FT] in rast.get(), or on
+	the unclass() of the imported ordered factors will show which pointers
+	were assigned. The mapping is still one-to-one, but the values differ
+	from those in the original GRASS layer.
+
+	Further, the compiled interfaces, although protected by ad hoc checks, 
+	do call functions in libgis.a which include calls to exit() from C, 
+	and can therefore abort R sessions. The user may wish to save the R 
+	session with save.image() before risking losing data from memory. 
+	
+	Safer versions of libgis.a functions will enter the GRASS code base 
+	in time; for now a copy of modified versions of env.c, error.c, and 
+	get_row.c from the grass5.0beta7 codebase may be found at: 
+
+	ftp://reclus.nhh.no/pub/misc/libes.gis.tar.gz
+	

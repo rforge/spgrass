@@ -1,0 +1,19 @@
+contourG                Equal scale contour plots for GRASS raster and
+                        site data
+get.mapsets             Access GRASS readable mapsets search path
+gmeta                   Reads GRASS metadata from the current LOCATION
+GRASS.connect           Access to underlying environment variables
+                        within GRASS
+kde2d.G                 Two-Dimensional Kernel Density Estimation on a
+                        GRASS Grid
+list.grass              List GRASS database elements
+pcbs                    PCBs in an area of South Wales
+plot.grassmeta          Equal scale plots for GRASS raster and site
+                        data
+rast.get                Import GRASS raster files
+rast.put                Exports to GRASS raster data files
+sites.get               Import GRASS sites file
+sites.put               Export GRASS sites file
+summary.grassmeta       Display GRASS metadata
+trmat.G                 Evaluate Trend Surface over a GRASS Grid
+utm.maas                Soil pollution data set

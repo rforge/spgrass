@@ -1,0 +1,5 @@
+LOG (only from 2003-08-22 - sorry)
+
+2003-08-22: Moved declaration to top of gmeta() in src/gmeta.c for Edzer, 
+	because compilation was breaking on gcc < 3.
+

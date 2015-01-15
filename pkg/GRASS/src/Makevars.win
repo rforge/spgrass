@@ -1,0 +1,2 @@
+PKG_CPPFLAGS = -DR_GRASS_INTERFACE -D__MINGW32_VERSION -I./include -I./include/win
+PKG_LIBS = $(ZLIB_LIBS) # for 080310

@@ -1,0 +1,1 @@
+static char *VERSION_STRING = "R_GRASS_INTERFACE";
