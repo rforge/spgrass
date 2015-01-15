@@ -1,0 +1,54 @@
+citHeader("To cite package 'spgrass6' in publications use your choice of:")
+     
+if(!exists("meta") || is.null(meta))
+    meta <- packageDescription("spgrass6")
+year <- sub("-.*", "", meta$Date)
+note <- sprintf("R package version %s", meta$Version)
+     
+citEntry(entry = "Manual",
+         title = "{spgrass6}: Interface between GRASS 6 and R",
+         author = personList(as.person("Roger Bivand")),
+         year = year,
+         note = note,
+         url = "http://CRAN.R-project.org/package=spgrass6",
+
+         textVersion = paste("Roger Bivand (", year, 
+             "). spgrass6: Interface between GRASS 6 and R. ",
+             note, ".", sep=""))
+
+citEntry(entry = "Article",
+         title = "Using the {R}--{GRASS} Interface: Current Status",
+         author = personList(as.person("Roger Bivand")),
+         year = "2007",
+         journal = "{OSGeo} Journal",
+         volume = "1",
+         pages = "36--38",
+         url = "http://www.osgeo.org/files/journal/final_pdfs/OSGeo_vol1_GRASS-R.pdf",
+
+         textVersion = paste("Roger Bivand (2007",
+             "). Using the {R}--{GRASS} Interface: Current Status. ",
+             "OSGeo Journal, 1, pp. 36-38", sep=""))
+
+citEntry(entry = "Book",
+         title = "Applied Spatial Data Analysis with {R}",
+         author = personList(as.person("Roger S. Bivand"),
+                             as.person("Edzer J. Pebesma"),
+                             as.person("Virgilio Gomez-Rubio")),
+         year = "2008",
+         publisher = "Springer",
+         address = "New York",
+         textVersion = paste("Roger S. Bivand, Edzer J. Pebesma and Virgilio Gomez-Rubio",
+             " (2008) Applied Spatial Data Analysis with R. ",
+             "Springer, New York.", sep=""))
+
+citEntry(entry = "Book",
+         title = "Open Source {GIS}: a {GRASS} {GIS} Approach",
+         author = personList(as.person("Markus Neteler"),
+                             as.person("Helena Mitasova")),
+         year = "2008",
+         publisher = "Springer",
+         address = "New York",
+         textVersion = paste("Markus Neteler and Helena Mitasova",
+             " (2008) Open Source GIS: a GRASS GIS Approach. ",
+             "Springer, New York.", sep=""))
+
