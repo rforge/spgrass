@@ -1,71 +1,57 @@
 % Copyright (C) 2005-2010 Roger S. Bivand
 %
-\name{readVECT6}
-\alias{readVECT6}
-\alias{writeVECT6}
+\name{readVECT}
+\alias{readVECT}
+\alias{writeVECT}
 \alias{vInfo}
 \alias{vColumns}
 \alias{vDataCount}
 \alias{vect2neigh}
-%\alias{putSites6sp}
-%\alias{getSites6sp}
-%\alias{putSites6}
-%\alias{getSites6}
-%\alias{cygwin_clean_temp}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Read and write GRASS 6+ vector object files}
+\title{Read and write GRASS 7 vector object files}
 \description{
-  \code{readVECT6} moves one GRASS 6+ vector object file with attribute data through a temporary shapefile to a Spatial*DataFrame object of type determined by the GRASS 6+ vector object; \code{writeVECT6} moves a Spatial*DataFrame object through a temporary shapefile to a GRASS vector object file. \code{vect2neigh} returns neighbour pairs with shared boundary length as described by Markus Neteler, in \url{https://stat.ethz.ch/pipermail/r-sig-geo/2005-October/000616.html}. \code{cygwin_clean_temp} can be called to try to clean the GRASS mapset-specific temporary directory under cygwin.
+  \code{readVECT} moves one GRASS 7 vector object file with attribute data through a temporary shapefile to a Spatial*DataFrame object of type determined by the GRASS 7 vector object; \code{writeVECT} moves a Spatial*DataFrame object through a temporary shapefile to a GRASS vector object file. \code{vect2neigh} returns neighbour pairs with shared boundary length as described by Markus Neteler, in \url{https://stat.ethz.ch/pipermail/r-sig-geo/2005-October/000616.html}. \code{cygwin_clean_temp} can be called to try to clean the GRASS mapset-specific temporary directory under cygwin.
 }
 \usage{
-readVECT6(vname, layer, type=NULL, plugin=NULL, remove.duplicates = TRUE,
+readVECT(vname, layer, type=NULL, plugin=NULL, remove.duplicates = TRUE,
  ignore.stderr = NULL, with_prj=TRUE, with_c=FALSE, mapset=NULL,
  pointDropZ=FALSE, driver="ESRI Shapefile")
-writeVECT6(SDF, vname,  v.in.ogr_flags=NULL, ignore.stderr = NULL,
+writeVECT(SDF, vname,  v.in.ogr_flags=NULL, ignore.stderr = NULL,
  driver="ESRI Shapefile")
 vInfo(vname, layer, ignore.stderr = NULL)
 vColumns(vname, layer, ignore.stderr = NULL)
 vDataCount(vname, layer, ignore.stderr = NULL)
 vect2neigh(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE, vname2=NULL,
  units="k")
-%putSites6sp(SPDF, vname,  ignore.stderr = FALSE) 
-%putSites6(df, vname, ignore.stderr = FALSE)
-%getSites6sp(vname, ignore.stderr = FALSE, with_prj=TRUE) 
-%getSites6(vname, ignore.stderr = FALSE, with_prj=TRUE)
-%cygwin_clean_temp(verbose=TRUE, ignore.stderr = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{vname}{A GRASS 6+ vector file name}
-  \item{layer}{a layer name (integer in GRASS 6, string in GRASS 7); if missing set to default of 1}
+  \item{vname}{A GRASS 7 vector file name}
+  \item{layer}{a layer name (string); if missing set to default of \dQuote{1}}
   \item{type}{override type detection when multiple types are non-zero, passed to v.out.ogr}
   \item{plugin}{default NULL for auto-detection, may be set to FALSE to avoid or TRUE if the plugin is known to be available; if the plugin is used, no further arguments other than mapset are respected}
   \item{remove.duplicates}{In line and area vector objects, multiple geometrical features may be associated with a single cat number, leading to duplication of data rows; this argument attempts to combine the geometrical features so that they match a single data row}
   \item{ignore.stderr}{default NULL, taking the value set by \code{set.ignore.stderrOption}, can be set to TRUE to silence \code{system()} output to standard error; does not apply on Windows platforms}
   \item{with_prj}{default TRUE, write ESRI-style PRJ file for transfered data}
-  \item{with_c}{default TRUE in GRASS 6, FALSE in GRASS 7; if TRUE in GRASS 6 or FALSE in GRASS 7, export features with category (labeled) only; if not default, all features are exported, including GRASS \dQuote{islands} which are probably spurious exterior rings filling holes.}
+  \item{with_c}{default FALSE in GRASS 7; if FALSE, export features with category (labeled) only; if not default, all features are exported, including GRASS \dQuote{islands} which are probably spurious exterior rings filling holes.}
   \item{mapset}{if plugin is TRUE, the mapset of the file to be imported may be changed from the current mapset by passing a character string}
   \item{pointDropZ}{default FALSE, if TRUE, discard third coordinates for point geometries; third coordinates are alway discarded for line and polygon geometries}
   \item{driver}{default \code{"ESRI Shapefile"}; a valid OGR writable driver name to define the file format for intermediate files, one of \code{c("GML", "SQLite"), c("ESRI_Shapefile", "MapInfo_File")}}
-  \item{SDF}{A Spatial*DataFrame to be moved to GRASS6 as a vector object, for SpatialPointsDataFrame, SpatialLinesDataFrame, and SpatialPolygonsDataFrame objects}
+  \item{SDF}{A Spatial*DataFrame to be moved to GRASS 7 as a vector object, for SpatialPointsDataFrame, SpatialLinesDataFrame, and SpatialPolygonsDataFrame objects}
   \item{v.in.ogr_flags}{Character vector containing additional optional flags and/or options for v.in.ogr, particularly "o" and "overwrite"}
   \item{ID}{A valid DB column name for unique identifiers (optional)}
   \item{remove}{default TRUE, remove copied vectors created in \code{vect2neigh}}
   \item{vname2}{If on a previous run, remove was FALSE, the name of the temporary vector may be given to circumvent its generation}
   \item{units}{default \dQuote{k}; see GRASS \code{v.to.db} manual page for alternatives}
-%  \item{SPDF}{A SpatialPointsDataFrame to be moved to GRASS6 as vector points}
-%  \item{df}{A data frame with at least columns named x, y and cat (no z support yet)}
-%  \item{verbose}{TRUE, can be set to false}
+
 }
 \value{
-   \code{readVECT6} imports a GRASS6+ vector object into a Spatial*DataFrame object with the type determined by the type of the GRASS6 vector object; \code{getSites6} returns a data frame. \code{vect2neigh} returns a data frame object with left and right neighbours and boundary lengths, also given class GRASSneigh and spatial.neighbour (as used in spdep). The incantation to retrieve the neighbours list is \code{sn2listw(vect2neigh())$neighbours}, and to retrieve the boundary lengths: \code{sn2listw(vect2neigh())$weights}. The GRASSneigh object has two other useful attributes: external is a vector giving the length of shared boundary between each polygon and the external area, and total giving each polygon's total boundary length.
+   \code{readVECT} imports a GRASS 7 vector object into a Spatial*DataFrame object with the type determined by the type of the GRASS 7 vector object. \code{vect2neigh} returns a data frame object with left and right neighbours and boundary lengths, also given class GRASSneigh and spatial.neighbour (as used in spdep). The incantation to retrieve the neighbours list is \code{sn2listw(vect2neigh())$neighbours}, and to retrieve the boundary lengths: \code{sn2listw(vect2neigh())$weights}. The GRASSneigh object has two other useful attributes: external is a vector giving the length of shared boundary between each polygon and the external area, and total giving each polygon's total boundary length.
 
-Note that GRASS6 vectors should be rebuilt by running \dQuote{v.build.all} in each mapset.
 }
 \note{
 Please note that the OGR drivers used may not handle missing data gracefully. From rgdal release 0.5-27, missing values are taken as unset OGR field values. If the OGR driver encodes them in this way, NAs will be moved across the interface correctly from R to GRASS, and from GRASS to R using the OGR GRASS vector plugin. Work is continuing to correct v.out.ogr so that it emits unset fields, which affects users with no OGR GRASS plugin for the present. Thanks to Dylan Beaudette for helping with missing data handling.
 
-Please also note that, on Windows and Cygwin systems, the temporary shapefiles are not removed by the interface functions, nor can GRASS remove them on termination - they must for the time being be removed manually. Windows believes that the GDAL/OGR library is still using them.
 }
 \author{Roger S. Bivand, e-mail: \email{Roger.Bivand@nhh.no.}}
 
@@ -80,20 +66,20 @@ if (nchar(Sys.getenv("GISRC")) > 0) {
     execGRASS("v.info", map="bugsites", layer=1L)
   }
   print(vInfo("bugsites"))
-  bugs <- readVECT6("bugsites", plugin=NULL)
+  bugs <- readVECT("bugsites", plugin=NULL)
   print(summary(bugs))
-  bugs1 <- readVECT6("bugsites", plugin=FALSE)
+  bugs1 <- readVECT("bugsites", plugin=FALSE)
   print(summary(bugs1))
-  writeVECT6(bugs, "newbugs", v.in.ogr_flags=c("o", "overwrite"))
+  writeVECT(bugs, "newbugs", v.in.ogr_flags=c("o", "overwrite"))
   if (execGRASS("g.version", intern=TRUE) > "GRASS 7") {
     execGRASS("v.info", map="newbugs", layer="1")
   } else {
     execGRASS("v.info", map="newbugs", layer=1L)
   }
-  nbugs <- readVECT6("newbugs")
+  nbugs <- readVECT("newbugs")
   print(summary(nbugs))
   print(vInfo("roads"))
-  roads <- readVECT6("roads")
+  roads <- readVECT("roads")
   print(summary(roads))
   set.ignore.stderrOption(ois)
 }

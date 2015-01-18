@@ -16,4 +16,4 @@ Suggests: rgdal (>= 0.8-8)
 SystemRequirements: GRASS (>= 7)
 License: GPL (>= 2)
 URL: http://grass.osgeo.org/
-Collate: AAA.R options.R spgrass6.R bin_link.R vect_link.R initGRASS.R xml1.R
+Collate: AAA.R options.R spgrass.R bin_link.R vect_link.R initGRASS.R xml1.R

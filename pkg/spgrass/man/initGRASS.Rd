@@ -41,7 +41,7 @@ unlink_.gislock()
 
 \author{Roger S. Bivand, e-mail: \email{Roger.Bivand@nhh.no}}
 
-\seealso{\code{\link{gmeta6}}}
+\seealso{\code{\link{gmeta}}}
 \examples{
 \dontrun{
 initGRASS("/usr/bin/grass-6.4.4", home=tempdir())

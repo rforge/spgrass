@@ -1,19 +1,14 @@
-# Interpreted GRASS 6 interface functions
-# Copyright (c) 2005-8 Roger S. Bivand
+# Interpreted GRASS 7 interface functions
+# Copyright (c) 2015 Roger S. Bivand
 #
 
-gmeta6 <- function(ignore.stderr = FALSE) {
+gmeta <- function(ignore.stderr = FALSE) {
         if (get.suppressEchoCmdInFuncOption()) {
             inEchoCmd <- get.echoCmdOption()
              tull <- set.echoCmdOption(FALSE)
         }
         tx <- execGRASS("g.region", flags=c("g", "3"), intern=TRUE,
             ignore.stderr=ignore.stderr)
-#	tull <- ifelse(.Platform$OS.type == "windows",
-#		tx <- system(paste(paste("g.region", .addexe(), sep=""),
-#                          "-g3"), intern=TRUE), 
-#		tx <- system("g.region -g3", 
-#		          intern=TRUE, ignore.stderr=ignore.stderr))	
 	tx <- gsub("=", ":", tx)
 	con <- textConnection(tx)
 	res <- read.dcf(con)
@@ -47,24 +42,19 @@ gmeta6 <- function(ignore.stderr = FALSE) {
 	lres$proj4 <- getLocationProj()
         gisenv <- execGRASS("g.gisenv", flags="n", intern=TRUE,
             ignore.stderr=ignore.stderr)
-#	tull <- ifelse(.Platform$OS.type == "windows", 
-#		gisenv <- system(paste("g.gisenv", .addexe(), sep=""),
-#                              intern=TRUE), 
-#		gisenv <- system("g.gisenv", 
-#		              intern=TRUE, ignore.stderr=ignore.stderr))
 	gisenv <- gsub("[';]", "", gisenv)
 	gisenv <- strsplit(gisenv, "=")
 	glist <- as.list(sapply(gisenv, function(x) x[2]))
 	names(glist) <- sapply(gisenv, function(x) x[1])
 	lres <- c(glist, lres)
-	class(lres) <- "gmeta6"
+	class(lres) <- "gmeta"
         if (get.suppressEchoCmdInFuncOption()) {
             tull <- set.echoCmdOption(inEchoCmd)
         }
 	lres
 }
 
-print.gmeta6 <- function(x, ...) {
+print.gmeta <- function(x, ...) {
     cat("gisdbase   ", x$GISDBASE, "\n")
     cat("location   ", x$LOCATION_NAME, "\n")
     cat("mapset     ", x$MAPSET, "\n")
@@ -81,7 +71,7 @@ print.gmeta6 <- function(x, ...) {
 }
 
 gmeta2grd <- function(ignore.stderr = FALSE) {
-	G <- gmeta6(ignore.stderr=ignore.stderr)
+	G <- gmeta(ignore.stderr=ignore.stderr)
 	cellcentre.offset <- c(G$w+(G$ewres/2), G$s+(G$nsres/2))
 	cellsize <- c(G$ewres, G$nsres)
 	cells.dim <- c(G$cols, G$rows)
@@ -94,11 +84,6 @@ gmeta2grd <- function(ignore.stderr = FALSE) {
 
 getLocationProj <- function(ignore.stderr = FALSE) {
 # too strict assumption on g.proj Rohan Sadler 20050928
-#	ifelse(.Platform$OS.type == "windows", 
-#		projstr <- system(paste(paste("g.proj", .addexe(), sep=""),
-#                               "-j -f"), intern=TRUE), 
-#		projstr <- system("g.proj -j -f", intern=TRUE, 
-#		               ignore.stderr=ignore.stderr))
         if (get.suppressEchoCmdInFuncOption()) {
             inEchoCmd <- get.echoCmdOption()
              tull <- set.echoCmdOption(FALSE)
@@ -129,9 +114,6 @@ getLocationProj <- function(ignore.stderr = FALSE) {
 }
 
 .g_findfile <- function(vname, type) {
-#    cmd <- paste("g.findfile", .addexe(), " element=", type, " file=", 
-#        vname[1], sep="")
-#    ms <- system(cmd, intern=TRUE)
     ms <- execGRASS("g.findfile", element=type, file=vname[1],
         intern=TRUE)
     tx <- gsub("=", ":", ms)
@@ -151,7 +133,7 @@ getLocationProj <- function(ignore.stderr = FALSE) {
 .addexe <- function() {
     res <- ""
     SYS <- get("SYS", envir=.GRASS_CACHE)
-    if (SYS == "msys" || SYS == "WinNat" || SYS == "cygwin") res =".exe"
+    if (SYS == "msys" || SYS == "WinNat") res =".exe"
     res
 }
 

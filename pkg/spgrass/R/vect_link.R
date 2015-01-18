@@ -1,7 +1,7 @@
-# Interpreted GRASS 6+ interface functions
-# Copyright (c) 2005-2012 Roger S. Bivand
+# Interpreted GRASS 7 interface functions
+# Copyright (c) 20015 Roger S. Bivand
 #
-readVECT6 <- function(vname, layer, type=NULL, plugin=NULL,
+readVECT <- function(vname, layer, type=NULL, plugin=NULL,
         remove.duplicates=TRUE, 
 	ignore.stderr = NULL, with_prj=TRUE, with_c=FALSE, mapset=NULL, 
 	pointDropZ=FALSE, driver="ESRI Shapefile") {
@@ -24,7 +24,7 @@ readVECT6 <- function(vname, layer, type=NULL, plugin=NULL,
     if (!G7) {
       with_c <- !with_c
       if (!ignore.stderr) 
-        message("with_c: argument reversed from version 0.7-11 and in GRASS 6")
+        message("with_c: argument reversed from version 0.7-11 and in GRASS ")
     }
     if (driver == "GRASS") plugin <- TRUE
 
@@ -37,7 +37,7 @@ readVECT6 <- function(vname, layer, type=NULL, plugin=NULL,
     if (plugin) {
         ogrD <- rgdal::ogrDrivers()$name
 	if (!("GRASS" %in% ogrD)) stop("no GRASS plugin driver")
-        gg <- gmeta6()
+        gg <- gmeta()
         if (is.null(mapset)) {
             c_at <- strsplit(vname[1], "@")[[1]]
             if (length(c_at) == 1) {
@@ -49,7 +49,7 @@ readVECT6 <- function(vname, layer, type=NULL, plugin=NULL,
         }
         dsn <- paste(gg$GISDBASE, gg$LOCATION_NAME, mapset,
             "vector", vname[1], "head", sep="/")
-        if (sss[1] >= "0.6" && as.integer(sss[2]) > 7) {
+        if (sss[1] >= "0." && as.integer(sss[2]) > 7) {
 	    res <- rgdal::readOGR(dsn, layer=as.character(layer),
                 verbose=!ignore.stderr, pointDropZ=pointDropZ)
         } else {
@@ -106,10 +106,10 @@ readVECT6 <- function(vname, layer, type=NULL, plugin=NULL,
             LAYER <- shname
         }
         execGRASS("v.out.ogr", flags=flags, input=vname,
-            type=type, layer=layer, dsn=GDSN, olayer=LAYER,
+            type=type, layer=layer, output=GDSN, output_layer=LAYER,
             format=gsub(" ", "_", driver), ignore.stderr=ignore.stderr)
 
-        if (sss[1] >= "0.6" && as.integer(sss[2]) > 7) {
+        if (sss[1] >= "0." && as.integer(sss[2]) > 7) {
 	    res <- rgdal::readOGR(dsn=RDSN, layer=LAYER, verbose=!ignore.stderr, 
 	        pointDropZ=pointDropZ)
         } else {
@@ -238,7 +238,7 @@ readVECT6 <- function(vname, layer, type=NULL, plugin=NULL,
     return(retval)
 }
 
-writeVECT6 <- function(SDF, vname, #factor2char = TRUE, 
+writeVECT <- function(SDF, vname, #factor2char = TRUE, 
 	v.in.ogr_flags=NULL, ignore.stderr = NULL, driver="ESRI Shapefile") {
 
         if (get.suppressEchoCmdInFuncOption()) {
@@ -297,7 +297,7 @@ writeVECT6 <- function(SDF, vname, #factor2char = TRUE,
 
 
 	execGRASS("v.in.ogr", flags=v.in.ogr_flags,
-	    dsn=GDSN, output=vname, layer=LAYER,
+	    input=GDSN, output=vname, layer=LAYER,
 	    ignore.stderr=ignore.stderr)
 
 	if (.Platform$OS.type != "windows") {
@@ -627,28 +627,6 @@ vect2neigh <- function(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE,
     }
 
     reso
-}
-
-cygwin_clean_temp <- function(verbose=TRUE, ignore.stderr = FALSE) {
-	if (Sys.getenv("OSTYPE") != "cygwin") stop("this hack just for cygwin")
-	pid <- as.integer(round(runif(1, 1, 1000)))
-	cmd <- paste(paste("g.tempfile", .addexe(), sep=""),
-                    " pid=", pid, sep="")
-
-	gtmpfl1 <- dirname(ifelse(.Platform$OS.type == "windows", 
-		system(cmd, intern=TRUE), system(cmd, 
-		intern=TRUE, ignore.stderr=ignore.stderr)))
-	rtmpfl1 <- ifelse(.Platform$OS.type == "windows" &&
-                (Sys.getenv("OSTYPE") == "cygwin"), 
-		system(paste("cygpath -w", gtmpfl1, sep=" "), intern=TRUE), 
-		gtmpfl1)
-	flst <- list.files(rtmpfl1)
-	for (i in flst) {
-		f <- paste(rtmpfl1, i, sep="\\")
-		x <- file.remove(f)
-		if (verbose) cat(f, x, "\n")
-	}
-	invisible(flst)
 }
 
 

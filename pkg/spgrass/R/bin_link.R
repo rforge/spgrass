@@ -1,8 +1,8 @@
-# Interpreted GRASS 6+ interface functions
-# Copyright (c) 2005-2013 Roger S. Bivand
+# Interpreted GRASS 7 interface functions
+# Copyright (c) 2015 Roger S. Bivand
 #
 
-readRAST6 <- function(vname, cat=NULL, ignore.stderr = NULL, 
+readRAST <- function(vname, cat=NULL, ignore.stderr = NULL, 
 	NODATA=NULL, plugin=NULL, mapset=NULL, useGDAL=NULL, close_OK=TRUE,
         drivername="GTiff", driverFileExt=NULL, return_SGDF=TRUE) {
 	if (!is.null(cat))
@@ -376,7 +376,7 @@ read_plugin <- function(vname, mapset=NULL, ignore.stderr=NULL) {
         stopifnot(is.logical(ignore.stderr))
         if (length(vname) > 1) stop("single raster required for plugin")
 
-        gg <- gmeta6()
+        gg <- gmeta()
         if (is.null(mapset)) {
             c_at <- strsplit(vname[1], "@")[[1]]
             if (length(c_at) == 1) {
@@ -418,7 +418,7 @@ read_plugin <- function(vname, mapset=NULL, ignore.stderr=NULL) {
 }
     
 
-writeRAST6 <- function(x, vname, zcol = 1, NODATA=NULL, 
+writeRAST <- function(x, vname, zcol = 1, NODATA=NULL, 
 	ignore.stderr = NULL, useGDAL=NULL, overwrite=FALSE, flags=NULL,
         drivername="GTiff") {
 

@@ -1,5 +1,5 @@
-# Interpreted GRASS 6+ interface functions
-# Copyright (c) 2011 Roger S. Bivand
+# Interpreted GRASS 7 interface functions
+# Copyright (c) 2015 Roger S. Bivand
 #
 
 set.ignore.stderrOption <- function(value) {

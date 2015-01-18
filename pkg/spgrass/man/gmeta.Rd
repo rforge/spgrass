@@ -1,10 +1,10 @@
 % Copyright (C) 2005 Roger S. Bivand
 %
-\name{gmeta6}
-\alias{gmeta6}
+\name{gmeta}
+\alias{gmeta}
 \alias{getLocationProj}
 \alias{gmeta2grd}
-\alias{print.gmeta6}
+\alias{print.gmeta}
 \alias{get.ignore.stderrOption}
 \alias{get.stop_on_no_flags_parasOption}
 \alias{get.useGDALOption}
@@ -29,10 +29,10 @@
   GRASS LOCATION metadata are read into a list in R; helper function getLocationProj returns an spproj-compliant PROJ.4 string of projection information. The helper function \code{gmeta2grd} creates a GridTopology object from the current GRASS mapset region definitions.
 }
 \usage{
-gmeta6(ignore.stderr = FALSE)
+gmeta(ignore.stderr = FALSE)
 getLocationProj(ignore.stderr = FALSE)
 gmeta2grd(ignore.stderr = FALSE)
-\method{print}{gmeta6}(x, ...)
+\method{print}{gmeta}(x, ...)
 get.ignore.stderrOption()
 get.stop_on_no_flags_parasOption()
 get.useGDALOption()
@@ -54,7 +54,7 @@ set.suppressEchoCmdInFuncOption(value)
 }
 \arguments{
   \item{ignore.stderr}{default FALSE, can be set to TRUE to silence \code{system()} output to standard error; does not apply on Windows platforms}
-  \item{x}{S3 object returned by gmeta6}
+  \item{x}{S3 object returned by gmeta}
   \item{...}{arguments passed through print method}
   \item{value}{logical value for setting options on \code{ignore.stderr} set by default on package load to FALSE, \code{stop_on_no_flags_paras} set by default on package load to TRUE, \code{useGDAL} set by default on package load to TRUE, \code{plugin} set by default on package load to NULL, \code{echoCmd} set by default on package load to FALSE. \code{useIntern} sets the \code{intern} argument globally; \code{legacyExec} sets the \code{legacyExec} option globally, but is initialized to FALSE on unix systems (all but Windows) and TRUE on Windows; \code{defaultFlags} is initialized to NULL, but may be a character vector with values from \code{c("quiet", "verbose")} \code{suppressEchoCmdInFunc} default TRUE suppresses the effect of \code{echoCmd} within package functions, may be set FALSE for debugging.}
 }
@@ -68,7 +68,7 @@ set.suppressEchoCmdInFuncOption(value)
 
 \examples{
 if (nchar(Sys.getenv("GISRC")) > 0) {
-  G <- gmeta6()
+  G <- gmeta()
   print(G)
   CRS(getLocationProj())
   grd <- gmeta2grd()

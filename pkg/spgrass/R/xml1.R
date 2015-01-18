@@ -23,13 +23,6 @@ parseGRASS <- function(cmd, legacyExec=NULL) {
                     pattern=".bat$"))
                 assign("WN_bat", WN_bat, envir=.GRASS_CACHE)
             }
-        } else if (get("SYS", envir=.GRASS_CACHE) == "cygwin") {
-            if (any(nchar(WN_bat <- get("WN_bat", envir=.GRASS_CACHE)) == 0)) {
-                WN_bat <- list.files(system(paste("cygpath -w",
-                    paste(Sys.getenv("GISBASE"), "scripts", sep="/")),
-                    intern=TRUE))
-                assign("WN_bat", WN_bat, envir=.GRASS_CACHE)
-            }
         } else if (get("SYS", envir=.GRASS_CACHE) == "msys") {
             if (any(nchar(WN_bat <- get("WN_bat", envir=.GRASS_CACHE)) == 0)) {
                 WN_bat <- list.files(paste(Sys.getenv("GISBASE"), "scripts",
@@ -41,11 +34,6 @@ parseGRASS <- function(cmd, legacyExec=NULL) {
         if ((get("SYS", envir=.GRASS_CACHE) == "WinNat") && cmd %in% WN_bat)
             ext <- ".bat"
         else if ((get("SYS", envir=.GRASS_CACHE) == "msys") &&
-            cmd %in% WN_bat) {
-                ext <- ""
-                prep <- paste("sh.exe ", Sys.getenv("GISBASE"),
-                    "/scripts/", sep="")
-        } else if ((get("SYS", envir=.GRASS_CACHE) == "cygwin") &&
             cmd %in% WN_bat) {
                 ext <- ""
                 prep <- paste("sh.exe ", Sys.getenv("GISBASE"),

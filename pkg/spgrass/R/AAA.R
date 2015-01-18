@@ -1,17 +1,8 @@
 .GRASS_CACHE <- new.env(FALSE, parent=globalenv())
-#assign("cmdCACHE", list(), envir=.GRASS_CACHE)
-#assign("addEXE", .addexe(), envir=.GRASS_CACHE)
 
 if(!exists("Sys.setenv", envir = baseenv())) Sys.setenv <- Sys.putenv
 
 .onLoad <- function(lib, pkg) {
-#.First.lib <- function(lib, pkg) {
-#  if (Sys.getenv("OSTYPE") == "cygwin") {
-#    cygwin_clean_temp(verbose=FALSE)
-#    packageStartupMessage("Cygwin temp directory flushed\n", appendLF = FALSE)
-#  }
-# commented out for GRASS >= 6.3
-#  require("sp")
   assign(".GRASS_old.GRASS_PAGER", Sys.getenv("GRASS_PAGER"), envir=.GRASS_CACHE)
   Sys.setenv("GRASS_PAGER"="cat")
   assign(".GRASS_old.GRASS_MESSAGE_FORMAT", Sys.getenv("GRASS_MESSAGE_FORMAT"),
@@ -28,12 +19,11 @@ if(!exists("Sys.setenv", envir = baseenv())) Sys.setenv <- Sys.putenv
   SYS <- ""
   if (.Platform$OS.type == "windows") {
     if (Sys.getenv("OSTYPE") == "msys") SYS <- "msys"
-    else if (Sys.getenv("OSTYPE") == "cygwin") SYS <- "cygwin"
     else SYS <- "WinNat"
   } else if (.Platform$OS.type == "unix") SYS <- "unix"
   assign("SYS", SYS, envir=.GRASS_CACHE)
   res <- ""
-  if (SYS == "msys" || SYS == "WinNat" || SYS == "cygwin") res =".exe"
+  if (SYS == "msys" || SYS == "WinNat") res =".exe"
   assign("addEXE", res, envir=.GRASS_CACHE)
   assign("WN_bat", "", envir=.GRASS_CACHE)
   if (SYS == "WinNat" && nchar(gisrc) > 0) {
@@ -64,10 +54,6 @@ if(!exists("Sys.setenv", envir = baseenv())) Sys.setenv <- Sys.putenv
         sep=""),  intern=TRUE)
     assign("GV", gv, envir=.GRASS_CACHE)
     if(nchar(loc) == 0) {
-      gisrc <- ifelse(.Platform$OS.type == "windows" &&
-                (Sys.getenv("OSTYPE") == "cygwin"), 
-		system(paste("cygpath -w", gisrc, sep=" "), intern=TRUE), 
-		gisrc)
       loc <- read.dcf(gisrc)[1,"LOCATION_NAME"]
     }
   }
@@ -77,14 +63,9 @@ if(!exists("Sys.setenv", envir = baseenv())) Sys.setenv <- Sys.putenv
     ifelse(nchar(loc) == 0, '', paste('and location: ', loc, '\n', sep="")),
       sep="")
   packageStartupMessage(Smess, appendLF = FALSE)
-#  require("rgdal")
-#  require("XML")
-  
-#  .GRASS_CACHE <- new.env(FALSE, parent=globalenv())
 }
 
 .onUnload <- function(lib, pkg) {
-#.Last.lib <- function(lib, pkg) {
     if (get("INIT_USED", envir=.GRASS_CACHE)) {
         unlink_.gislock()
         unset.GIS_LOCK()

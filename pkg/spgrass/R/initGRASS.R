@@ -215,5 +215,5 @@ initGRASS <- function(gisBase, home, SG, gisDbase, location, mapset,
     if (!file.exists(tfile)) file.copy(pfile, tfile, overwrite=TRUE)
     tfile <- paste(loc_path, mapset, "WIND", sep="/")
     if (!file.exists(tfile)) file.copy(pfile, tfile, overwrite=TRUE)
-    gmeta6()
+    gmeta()
 }
