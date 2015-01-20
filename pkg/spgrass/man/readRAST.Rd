@@ -59,10 +59,10 @@ if (nchar(Sys.getenv("GISRC")) > 0) {
   boxplot(spear$elevation.dem ~ spear$geology)
   spear$sqdem <- sqrt(spear$elevation.dem)
   if ("GRASS" \%in\% gdalDrivers()$name) {
-    execGRASS("g.region", rast="elevation.dem")
+    execGRASS("g.region", raster="elevation.dem")
     dem1 <- readRAST("elevation.dem", plugin=TRUE, mapset="PERMANENT")
     print(summary(dem1))
-    execGRASS("g.region", rast="elevation.dem")
+    execGRASS("g.region", raster="elevation.dem")
   }
   writeRAST(spear, "sqdemSP", zcol="sqdem")
   execGRASS("r.info", map="sqdemSP")
