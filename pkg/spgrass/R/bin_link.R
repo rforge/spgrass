@@ -39,11 +39,22 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = NULL,
     if (plugin) {
         resa <- read_plugin(vname, mapset=NULL, ignore.stderr=ignore.stderr)
     } else {
+        resa <- read_bin(vname=vname, NODATA=NODATA, driverFileExt=driverFileExt, ignore.stderr=ignore.stderr, return_SGDF=return_SGDF, inEchoCmd=inEchoCmd, cat=cat)
+    }
+    if (close_OK) { #closeAllConnections()
+        openConns_now <- as.integer(row.names(showConnections()))
+        toBeClosed <- openConns_now[!(openConns_now %in% openedConns)]
+        for (bye in toBeClosed) close(bye)
+    }
+
+    resa
+}
+
+
+read_bin <- function(vname, NODATA, driverFileExt, ignore.stderr, return_SGDF, inEchoCmd, cat){
+    {
 	pid <- as.integer(round(runif(1, 1, 1000)))
 	p4 <- CRS(getLocationProj())
-
-# 090311 fix for -c flag
-        Cflag <- "c" %in% parseGRASS("r.out.gdal")$fnames
 
         reslist <- vector(mode="list", length=length(vname))
         names(reslist) <- vname
@@ -154,12 +165,6 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = NULL,
 	grid <- GridTopology(co, unname(c(gdal_info[6], gdal_info[7])),
             unname(c(gdal_info[2], gdal_info[1])))
 
-	if (close_OK) { #closeAllConnections()
-            openConns_now <- as.integer(row.names(showConnections()))
-            toBeClosed <- openConns_now[!(openConns_now %in% openedConns)]
-            for (bye in toBeClosed) close(bye)
-        }
-
         if (!return_SGDF) {
            res <- list(grid=grid, dataList=reslist, proj4string=p4)
            class(res) <- "gridList"
@@ -200,12 +205,11 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = NULL,
 		}
 	} 
     }
-    if (get.suppressEchoCmdInFuncOption()) {
-        tull <- set.echoCmdOption(inEchoCmd)
-    }
-
-    resa
+    return(resa)
 }
+
+
+
 
 bin_gdal_info <- function(fname, to_int) {
 	if (!file.exists(fname)) stop(paste("no such file:", fname))
