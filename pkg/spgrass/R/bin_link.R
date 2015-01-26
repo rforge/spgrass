@@ -41,13 +41,9 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = NULL,
     } else {
 	pid <- as.integer(round(runif(1, 1, 1000)))
 	p4 <- CRS(getLocationProj())
-        Gver <- execGRASS("g.version", intern=TRUE, 
-		ignore.stderr=ignore.stderr)
-	G63 <- !(Gver < "GRASS 6.3") #Gver > "GRASS 6.2"
 
 # 090311 fix for -c flag
         Cflag <- "c" %in% parseGRASS("r.out.gdal")$fnames
-        g7 <- Gver >= "GRASS 7"
 
         reslist <- vector(mode="list", length=length(vname))
         names(reslist) <- vname
@@ -55,15 +51,9 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = NULL,
 	for (i in seq(along=vname)) {
 
 
-		if (g7) {
-                    glist <- execGRASS("r.info", flags="g", map=vname[i],
-                    intern=TRUE, ignore.stderr=ignore.stderr)
-                    whCELL <- glist[grep("datatype", glist)]
-                } else {
-                    whCELL <- execGRASS("r.info", flags="t",
-		    map=vname[i], intern=TRUE, 
-		    ignore.stderr=ignore.stderr)
-                }
+                glist <- execGRASS("r.info", flags="g", map=vname[i],
+                               intern=TRUE, ignore.stderr=ignore.stderr)
+                whCELL <- glist[grep("datatype", glist)]
 		to_int <- length(which(unlist(strsplit(
 			whCELL, "=")) == "CELL")) > 0
                 Dcell <- length(which(unlist(strsplit(
@@ -90,44 +80,8 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = NULL,
 			warning("NODATA rounded to integer")
 		    NODATA <- round(NODATA)
 		}
-		if (useGDAL && G63) {
-                  if (requireNamespace("rgdal", quietly = TRUE)) {
-
-                    gdalDGRASS <- execGRASS("r.out.gdal", flags="l",
-                        intern=TRUE, ignore.stderr=ignore.stderr)
-	            if (!(drivername %in% gdalD))
-                        stop(paste("Requested driver", drivername,
-                            "not available in rgdal"))
-                    if (length(grep(drivername, gdalDGRASS)) == 0)
-                        stop(paste("Requested driver", drivername,
-                            "not available in GRASS"))
-		    type <- ifelse (to_int, "Int32",
-                        ifelse(Dcell, "Float64", "Float32"))
-                    flags <- c("quiet")
-                    if (Cflag) flags <- c("c", flags)
-                    paras <- list(input=vname[i], output=gtmpfl11, type=type,
-                        format=drivername)
-                    if (!is.null(NODATA)) paras <- c(paras, nodata=NODATA)
-                    execGRASS("r.out.gdal", flags=flags,
-			parameters=paras, ignore.stderr=ignore.stderr)
-
-#		    res <- readGDAL(rtmpfl11, p4s=getLocationProj(), 
-#			silent=ignore.stderr)
-#		    names(res) <- vname[i]
-
-                    if (i == 1) gdal_info <- rgdal::GDALinfo(rtmpfl11,
-                        silent=ignore.stderr)
-
-                    DS <- rgdal::GDAL.open(rtmpfl11, read.only=FALSE)
-                    reslist[[i]] <- as.vector(rgdal::getRasterData(DS, band=1))
-
-                    rgdal::deleteDataset(DS)
-                  } else {
-                    stop("rgdal not available")
-                  }
 
 # 130422 at rgdal 0.8-8 GDAL.close(DS)
-		} else {
 # 061107 Dylan Beaudette NODATA
 # 071009 Markus Neteler's idea to use range
 	  	    if (is.null(NODATA)) {
@@ -152,13 +106,6 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = NULL,
                     }
                     rOutBinFlags <- "b"
 # 120118 Rainer Krug
-                    if (Gver < "GRASS 6.4.2") {
-                        if (to_int) rOutBinFlags <- c(rOutBinFlags, "i")
-		        execGRASS("r.out.bin", flags=rOutBinFlags, 
-			    input=vname[i], output=gtmpfl11,
-			    null=as.integer(NODATA),
-                            ignore.stderr=ignore.stderr)
-                    } else {
                         if (to_int) rOutBinFlags <- c(rOutBinFlags, "i")
                         else rOutBinFlags <- c(rOutBinFlags, "f")
                         rOutBinBytes <- 4L
@@ -167,7 +114,6 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = NULL,
 			    input=vname[i], output=gtmpfl11, bytes=rOutBinBytes,
 			    null=as.integer(NODATA),
                             ignore.stderr=ignore.stderr)
-                    }
 
                     gdal_info <- bin_gdal_info(rtmpfl11, to_int)
 
@@ -181,7 +127,6 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = NULL,
 
 		    unlink(paste(rtmpfl1, list.files(rtmpfl1,
                         pattern=vname[i]), sep=.Platform$file.sep))
-		}
 
 
 #		if (i == 1) resa <- res
@@ -449,47 +394,6 @@ writeRAST <- function(x, vname, zcol = 1, NODATA=NULL,
 		stop("only numeric columns may be exported")
 	if (overwrite && !("overwrite" %in% flags))
 		flags <- c(flags, "overwrite")
-        Gver <- execGRASS("g.version", intern=TRUE, 
-		ignore.stderr=ignore.stderr)
-	G63 <- !(Gver < "GRASS 6.3") #Gver > "GRASS 6.2"
-	if (useGDAL && G63) {
-          if (requireNamespace("rgdal", quietly = TRUE)) {
-            gdalD <- rgdal::gdalDrivers()$name
-            gdalDGRASS <- execGRASS("r.out.gdal", flags="l",
-                intern=TRUE, ignore.stderr=ignore.stderr)
-	    if (!(drivername %in% gdalD))
-                stop(paste("Requested driver", drivername,
-                    "not available in rgdal"))
-            if (length(grep(drivername, gdalDGRASS)) == 0)
-                stop(paste("Requested driver", drivername,
-                    "not available in GRASS"))
-	    if (is.factor(x@data[[zcol]])) 
-		x@data[[zcol]] <- as.numeric(x@data[[zcol]])
-	    if (!is.numeric(x@data[[zcol]])) 
-		stop("only numeric values may be exported")
-	    if (is.null(NODATA)) {
-		NODATA <- floor(min(x@data[[zcol]], na.rm=TRUE)) - 1
-	    } else {
-		if (!is.finite(NODATA) || !is.numeric(NODATA))
-			stop("invalid NODATA value")
-		if (NODATA != round(NODATA)) 
-			warning("NODATA rounded to integer")
-		NODATA <- round(NODATA)
-	    }
-	    sm <- storage.mode(x[[zcol]])
-	    type <- ifelse(sm == "integer", "Int32", "Float32")
-	    res <- rgdal::writeGDAL(x[zcol], fname=rtmpfl11, type=type, 
-		drivername=drivername, mvFlag = NODATA)
-
-	    execGRASS("r.in.gdal", flags=flags, input=gtmpfl11,
-		output=vname, ignore.stderr=ignore.stderr)
-
-            DS <- rgdal::GDAL.open(rtmpfl11, read.only=FALSE)
-            rgdal::deleteDataset(DS)
-          } else {
-            stop("rgdal not available")
-          }
-	} else {
 	    res <- writeBinGrid(x, rtmpfl11, attr = zcol, na.value = NODATA)
 
 	    flags <- c(res$flag, flags)
@@ -504,7 +408,7 @@ writeRAST <- function(x, vname, zcol = 1, NODATA=NULL,
 
 	    unlink(paste(rtmpfl1, list.files(rtmpfl1, pattern=fid), 
 		sep=.Platform$file.sep))
-	}
+
         if (get.suppressEchoCmdInFuncOption()) {
             tull <- set.echoCmdOption(inEchoCmd)
         }

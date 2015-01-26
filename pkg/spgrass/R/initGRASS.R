@@ -87,7 +87,7 @@ initGRASS <- function(gisBase, home, SG, gisDbase, location, mapset,
             names(pyScripts) <- sub("\\.py", "", pyScripts)
             assign("pyScripts", pyScripts, envir=.GRASS_CACHE)
         }
-        Sys.setenv(WINGISRC=paste(Sys.getenv("HOME"), "\\.grassrc6", sep=""))
+        Sys.setenv(WINGISRC=paste(Sys.getenv("HOME"), "\\.grassrc7", sep=""))
         if (file.exists(Sys.getenv("WINGISRC")) && !override)
             stop("A GISRC file already exists; to override, set override=TRUE")
         Sys.setenv(GISRC="junk")
@@ -123,7 +123,7 @@ initGRASS <- function(gisBase, home, SG, gisDbase, location, mapset,
             ifelse(nchar(eLDPATH) == 0, "", ":"), eLDPATH, sep=""))
         }
 #FIXME Sys.info()["sysname"] == "Darwin"
-        Sys.setenv(GISRC=paste(home, "/.grassrc6", sep=""))
+        Sys.setenv(GISRC=paste(home, "/.grassrc7", sep=""))
 #FIXME
         if (file.exists(Sys.getenv("GISRC")) && !override)
             stop("A GISRC file already exists; to override, set override=TRUE")
