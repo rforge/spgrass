@@ -33,10 +33,10 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = get.ignore.stderrOption(),
                 if (is.null(plugin)) plugin <- "GRASS" %in% gdalD
                 if (length(vname) > 1) plugin <- FALSE
                 if (plugin) {
-                    resa <- read_rast_plugin(vname, mapset=NULL, ignore.stderr=ignore.stderr)
+                    resa <- .read_rast_plugin(vname, mapset=NULL, ignore.stderr=ignore.stderr)
                 } else {
-                    resa <- read_rast_non_plugin(vname=vname, NODATA=NODATA, driverFileExt=driverFileExt,
-                                     ignore.stderr=ignore.stderr, return_SGDF=return_SGDF, cat=cat)
+                    resa <- .read_rast_non_plugin(vname=vname, NODATA=NODATA,
+                                                  driverFileExt=driverFileExt, ignore.stderr=ignore.stderr, return_SGDF=return_SGDF, cat=cat)
                 }
             },
             finally = {
@@ -55,7 +55,7 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = get.ignore.stderrOption(),
 }
 
 
-read_rast_bin <- function(vname, NODATA, driverFileExt, ignore.stderr, return_SGDF, cat){
+.read_rast_non_plugin <- function(vname, NODATA, driverFileExt, ignore.stderr, return_SGDF, cat){
     {
 	pid <- as.integer(round(runif(1, 1, 1000)))
 	p4 <- CRS(getLocationProj())
@@ -319,7 +319,7 @@ readBinGridData <- function(fname, what, n, size, endian, nodata) {
 #	res
 #}
 
-read_rast_non_plugin <- function(vname, mapset=NULL, ignore.stderr=NULL) {
+.read_rast_plugin <- function(vname, mapset=NULL, ignore.stderr=NULL) {
 
         if (is.null(ignore.stderr))
             ignore.stderr <- get.ignore.stderrOption()
