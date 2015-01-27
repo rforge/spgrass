@@ -9,49 +9,57 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = NULL,
 		if(length(vname) != length(cat)) 
 			stop("vname and cat not same length")
     if (get.suppressEchoCmdInFuncOption()) {
-        inEchoCmd <- get.echoCmdOption()
-        tull <- set.echoCmdOption(FALSE)
+        inEchoCmd <- set.echoCmdOption(FALSE)
     }
-    if (is.null(plugin))
-        plugin <- get.pluginOption()
-    stopifnot(is.logical(plugin)|| is.null(plugin))
-    if (!is.null(plugin) && plugin && length(vname) > 1) plugin <- FALSE
-    if (is.null(ignore.stderr))
-        ignore.stderr <- get.ignore.stderrOption()
-    stopifnot(is.logical(ignore.stderr))
-    if (is.null(useGDAL))
-        useGDAL <- get.useGDALOption()
-    stopifnot(is.logical(useGDAL))
-    if (useGDAL) {
-      if (requireNamespace("rgdal", quietly = TRUE)) {
-        gdalD <- rgdal::gdalDrivers()$name
-      } else {
-        stop("rgdal not available")
-      }
-    }
-    if (!useGDAL && is.null(plugin)) plugin <- FALSE
-    if (close_OK) {
-         openedConns <- as.integer(row.names(showConnections()))
-    }
-
-    if (is.null(plugin)) plugin <- "GRASS" %in% gdalD
-    if (length(vname) > 1) plugin <- FALSE
-    if (plugin) {
-        resa <- read_plugin(vname, mapset=NULL, ignore.stderr=ignore.stderr)
-    } else {
-        resa <- read_bin(vname=vname, NODATA=NODATA, driverFileExt=driverFileExt, ignore.stderr=ignore.stderr, return_SGDF=return_SGDF, inEchoCmd=inEchoCmd, cat=cat)
-    }
-    if (close_OK) { #closeAllConnections()
-        openConns_now <- as.integer(row.names(showConnections()))
-        toBeClosed <- openConns_now[!(openConns_now %in% openedConns)]
-        for (bye in toBeClosed) close(bye)
-    }
+        tryCatch(
+            {
+                if (is.null(plugin))
+                    plugin <- get.pluginOption()
+                stopifnot(is.logical(plugin)|| is.null(plugin))
+                if (!is.null(plugin) && plugin && length(vname) > 1) plugin <- FALSE
+                if (is.null(ignore.stderr))
+                    ignore.stderr <- get.ignore.stderrOption()
+                stopifnot(is.logical(ignore.stderr))
+                if (is.null(useGDAL))
+                    useGDAL <- get.useGDALOption()
+                stopifnot(is.logical(useGDAL))
+                if (useGDAL) {
+                    if (requireNamespace("rgdal", quietly = TRUE)) {
+                        gdalD <- rgdal::gdalDrivers()$name
+                    } else {
+                        stop("rgdal not available")
+                    }
+                }
+                if (!useGDAL && is.null(plugin)) plugin <- FALSE
+                if (close_OK) {
+                    openedConns <- as.integer(row.names(showConnections()))
+                }
+                
+                if (is.null(plugin)) plugin <- "GRASS" %in% gdalD
+                if (length(vname) > 1) plugin <- FALSE
+                if (plugin) {
+                    resa <- read_plugin(vname, mapset=NULL, ignore.stderr=ignore.stderr)
+                } else {
+                    resa <- read_bin(vname=vname, NODATA=NODATA, driverFileExt=driverFileExt, ignore.stderr=ignore.stderr, return_SGDF=return_SGDF, cat=cat)
+                }
+                if (close_OK) { #closeAllConnections()
+                    openConns_now <- as.integer(row.names(showConnections()))
+                    toBeClosed <- openConns_now[!(openConns_now %in% openedConns)]
+                    for (bye in toBeClosed) close(bye)
+                }
+            },
+            finally = {
+                if (get.suppressEchoCmdInFuncOption()) {
+                    tull <- set.echoCmdOption(inEchoCmd)
+                }
+            }
+        )
 
     resa
 }
 
 
-read_bin <- function(vname, NODATA, driverFileExt, ignore.stderr, return_SGDF, inEchoCmd, cat){
+read_bin <- function(vname, NODATA, driverFileExt, ignore.stderr, return_SGDF, cat){
     {
 	pid <- as.integer(round(runif(1, 1, 1000)))
 	p4 <- CRS(getLocationProj())
@@ -168,9 +176,6 @@ read_bin <- function(vname, NODATA, driverFileExt, ignore.stderr, return_SGDF, i
         if (!return_SGDF) {
            res <- list(grid=grid, dataList=reslist, proj4string=p4)
            class(res) <- "gridList"
-           if (get.suppressEchoCmdInFuncOption()) {
-              tull <- set.echoCmdOption(inEchoCmd)
-           }
            return(res)
         }
 
@@ -372,50 +377,54 @@ writeRAST <- function(x, vname, zcol = 1, NODATA=NULL,
         drivername="GTiff") {
 
         if (get.suppressEchoCmdInFuncOption()) {
-            inEchoCmd <- get.echoCmdOption()
-            tull <- set.echoCmdOption(FALSE)
+            inEchoCmd <- set.echoCmdOption(FALSE)
         }
 
-        if (is.null(ignore.stderr))
-            ignore.stderr <- get.ignore.stderrOption()
-        stopifnot(is.logical(ignore.stderr))
-        if (is.null(useGDAL))
-            useGDAL <- get.useGDALOption()
-        stopifnot(is.logical(useGDAL))
-	pid <- as.integer(round(runif(1, 1, 1000)))
-	gtmpfl1 <- dirname(execGRASS("g.tempfile", pid=pid,
-	    intern=TRUE, ignore.stderr=ignore.stderr))
-
-	rtmpfl1 <- ifelse(.Platform$OS.type == "windows" &&
-                (Sys.getenv("OSTYPE") == "cygwin"), 
-		system(paste("cygpath -w", gtmpfl1, sep=" "), intern=TRUE), 
-		gtmpfl1)
-
-	fid <- paste("X", pid, sep="")
-	gtmpfl11 <- paste(gtmpfl1, fid, sep=.Platform$file.sep)
-	rtmpfl11 <- paste(rtmpfl1, fid, sep=.Platform$file.sep)
-	if (!is.numeric(x@data[[zcol]])) 
-		stop("only numeric columns may be exported")
-	if (overwrite && !("overwrite" %in% flags))
-		flags <- c(flags, "overwrite")
-	    res <- writeBinGrid(x, rtmpfl11, attr = zcol, na.value = NODATA)
-
-	    flags <- c(res$flag, flags)
-	    
-	    execGRASS("r.in.bin", flags=flags,
-                input=gtmpfl11,
-		output=vname, bytes=as.integer(res$bytes), 
-		north=as.numeric(res$north), south=as.numeric(res$south), 
-		east=as.numeric(res$east), west=as.numeric(res$west), 
-		rows=as.integer(res$rows), cols=as.integer(res$cols), 
-		anull=as.numeric(res$anull), ignore.stderr=ignore.stderr)
-
-	    unlink(paste(rtmpfl1, list.files(rtmpfl1, pattern=fid), 
-		sep=.Platform$file.sep))
-
-        if (get.suppressEchoCmdInFuncOption()) {
-            tull <- set.echoCmdOption(inEchoCmd)
-        }
+        tryCatch(
+            {
+                if (is.null(ignore.stderr))
+                    ignore.stderr <- get.ignore.stderrOption()
+                stopifnot(is.logical(ignore.stderr))
+                if (is.null(useGDAL))
+                    useGDAL <- get.useGDALOption()
+                stopifnot(is.logical(useGDAL))
+                pid <- as.integer(round(runif(1, 1, 1000)))
+                gtmpfl1 <- dirname(execGRASS("g.tempfile", pid=pid,
+                                             intern=TRUE, ignore.stderr=ignore.stderr))
+                
+                rtmpfl1 <- ifelse(.Platform$OS.type == "windows" &&
+                                      (Sys.getenv("OSTYPE") == "cygwin"), 
+                                  system(paste("cygpath -w", gtmpfl1, sep=" "), intern=TRUE), 
+                                  gtmpfl1)
+                
+                fid <- paste("X", pid, sep="")
+                gtmpfl11 <- paste(gtmpfl1, fid, sep=.Platform$file.sep)
+                rtmpfl11 <- paste(rtmpfl1, fid, sep=.Platform$file.sep)
+                if (!is.numeric(x@data[[zcol]])) 
+                    stop("only numeric columns may be exported")
+                if (overwrite && !("overwrite" %in% flags))
+                    flags <- c(flags, "overwrite")
+                res <- writeBinGrid(x, rtmpfl11, attr = zcol, na.value = NODATA)
+                
+                flags <- c(res$flag, flags)
+                
+                execGRASS("r.in.bin", flags=flags,
+                          input=gtmpfl11,
+                          output=vname, bytes=as.integer(res$bytes), 
+                          north=as.numeric(res$north), south=as.numeric(res$south), 
+                          east=as.numeric(res$east), west=as.numeric(res$west), 
+                          rows=as.integer(res$rows), cols=as.integer(res$cols), 
+                          anull=as.numeric(res$anull), ignore.stderr=ignore.stderr)
+                
+                unlink(paste(rtmpfl1, list.files(rtmpfl1, pattern=fid), 
+                             sep=.Platform$file.sep))
+            },
+            finally = {
+                if (get.suppressEchoCmdInFuncOption()) {
+                    tull <- set.echoCmdOption(inEchoCmd)
+                }
+            }
+        )
 
 	invisible(res)
 }
