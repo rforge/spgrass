@@ -2,8 +2,8 @@
 # Copyright (c) 2015 Roger S. Bivand
 #
 
-readRAST <- function(vname, cat=NULL, ignore.stderr = NULL, 
-	NODATA=NULL, plugin=NULL, mapset=NULL, useGDAL=NULL, close_OK=TRUE,
+readRAST <- function(vname, cat=NULL, ignore.stderr = get.ignore.stderrOption(), 
+	NODATA=NULL, plugin=get.pluginOption(), mapset=NULL, useGDAL=get.useGDALOption(), close_OK=TRUE,
         drivername="GTiff", driverFileExt=NULL, return_SGDF=TRUE) {
 	if (!is.null(cat))
 		if(length(vname) != length(cat)) 
@@ -11,17 +11,15 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = NULL,
     if (get.suppressEchoCmdInFuncOption()) {
         inEchoCmd <- set.echoCmdOption(FALSE)
     }
+                if (close_OK) {
+                    openedConns <- as.integer(row.names(showConnections()))
+                }
+
         tryCatch(
             {
-                if (is.null(plugin))
-                    plugin <- get.pluginOption()
                 stopifnot(is.logical(plugin)|| is.null(plugin))
                 if (!is.null(plugin) && plugin && length(vname) > 1) plugin <- FALSE
-                if (is.null(ignore.stderr))
-                    ignore.stderr <- get.ignore.stderrOption()
                 stopifnot(is.logical(ignore.stderr))
-                if (is.null(useGDAL))
-                    useGDAL <- get.useGDALOption()
                 stopifnot(is.logical(useGDAL))
                 if (useGDAL) {
                     if (requireNamespace("rgdal", quietly = TRUE)) {
@@ -31,24 +29,22 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = NULL,
                     }
                 }
                 if (!useGDAL && is.null(plugin)) plugin <- FALSE
-                if (close_OK) {
-                    openedConns <- as.integer(row.names(showConnections()))
-                }
                 
                 if (is.null(plugin)) plugin <- "GRASS" %in% gdalD
                 if (length(vname) > 1) plugin <- FALSE
                 if (plugin) {
                     resa <- read_plugin(vname, mapset=NULL, ignore.stderr=ignore.stderr)
                 } else {
-                    resa <- read_bin(vname=vname, NODATA=NODATA, driverFileExt=driverFileExt, ignore.stderr=ignore.stderr, return_SGDF=return_SGDF, cat=cat)
+                    resa <- read_bin(vname=vname, NODATA=NODATA, driverFileExt=driverFileExt,
+                                     ignore.stderr=ignore.stderr, return_SGDF=return_SGDF, cat=cat)
                 }
+            },
+            finally = {
                 if (close_OK) { #closeAllConnections()
                     openConns_now <- as.integer(row.names(showConnections()))
                     toBeClosed <- openConns_now[!(openConns_now %in% openedConns)]
                     for (bye in toBeClosed) close(bye)
                 }
-            },
-            finally = {
                 if (get.suppressEchoCmdInFuncOption()) {
                     tull <- set.echoCmdOption(inEchoCmd)
                 }
@@ -373,7 +369,7 @@ read_plugin <- function(vname, mapset=NULL, ignore.stderr=NULL) {
     
 
 writeRAST <- function(x, vname, zcol = 1, NODATA=NULL, 
-	ignore.stderr = NULL, useGDAL=NULL, overwrite=FALSE, flags=NULL,
+	ignore.stderr = get.ignore.stderrOption(), useGDAL=get.useGDALOption(), overwrite=FALSE, flags=NULL,
         drivername="GTiff") {
 
         if (get.suppressEchoCmdInFuncOption()) {
@@ -382,11 +378,7 @@ writeRAST <- function(x, vname, zcol = 1, NODATA=NULL,
 
         tryCatch(
             {
-                if (is.null(ignore.stderr))
-                    ignore.stderr <- get.ignore.stderrOption()
                 stopifnot(is.logical(ignore.stderr))
-                if (is.null(useGDAL))
-                    useGDAL <- get.useGDALOption()
                 stopifnot(is.logical(useGDAL))
                 pid <- as.integer(round(runif(1, 1, 1000)))
                 gtmpfl1 <- dirname(execGRASS("g.tempfile", pid=pid,

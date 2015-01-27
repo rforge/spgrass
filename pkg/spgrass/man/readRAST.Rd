@@ -10,8 +10,8 @@ Read GRASS 7 raster files from GRASS 7 into R SpatialGridDataFrame objects, and 
 
 
 \usage{
-readRAST(vname, cat=NULL, ignore.stderr = NULL, NODATA=NULL, plugin=NULL,
- mapset=NULL, useGDAL=NULL, close_OK=TRUE, drivername="GTiff",
+readRAST(vname, cat=NULL, ignore.stderr = get.ignore.stderrOption(), NODATA=NULL, plugin=get.plouginOption(),
+ mapset=NULL, useGDAL=get.useGDALOption(), close_OK=TRUE, drivername="GTiff",
  driverFileExt=NULL, return_SGDF=TRUE)
 writeRAST(x, vname, zcol = 1, NODATA=NULL, ignore.stderr = NULL,
  useGDAL=NULL, overwrite=FALSE, flags=NULL, drivername="GTiff")
@@ -20,10 +20,11 @@ writeRAST(x, vname, zcol = 1, NODATA=NULL, ignore.stderr = NULL,
 \arguments{
   \item{vname}{A vector of GRASS 7 raster file names}
   \item{cat}{default NULL; if not NULL, must be a logical vector matching vname, stating which (CELL) rasters to return as factor}
-  \item{ignore.stderr}{default NULL, taking the value set by \code{set.ignore.stderrOption}, can be set to TRUE to silence \code{system()} output to standard error; does not apply on Windows platforms}
-  \item{plugin}{default NULL does auto-detection, changes to FALSE if vname is longer than 1, and a sanity check will be run on raster and current region, and the function will revert to FALSE if mismatch is found; if TRUE, the plugin is available and the raster should be read in its original region and resolution; if the plugin is used, no further arguments other than mapset are respected}
+  \item{ignore.stderr}{default taking the value set by \code{set.ignore.stderrOption}; can be set to TRUE to silence \code{system()} output to standard error; does not apply on Windows platforms}
+  \item{plugin}{default taking the value set by \code{set.pluginOption};
+    NULL does auto-detection, changes to FALSE if vname is longer than 1, and a sanity check will be run on raster and current region, and the function will revert to FALSE if mismatch is found; if TRUE, the plugin is available and the raster should be read in its original region and resolution; if the plugin is used, no further arguments other than mapset are respected}
   \item{mapset}{default NULL, if plugin is TRUE, the mapset of the file to be imported will be autodetected; if not NULL and if plugin is TRUE, a character string overriding the autodetected mapset, otherwise ignored}
-  \item{useGDAL}{default NULL, taking the value set by \code{set.useGDALOption}; use r.out.gdal or plugin and \code{readGDAL} if autodetected or plugin=TRUE; or for writing \code{writeGDAL}, GTiff, and r.in.gdal, if FALSE using r.out.bin or r.in.bin}
+  \item{useGDAL}{default taking the value set by \code{set.useGDALOption}; use r.out.gdal or plugin and \code{readGDAL} if autodetected or plugin=TRUE; or for writing \code{writeGDAL}, GTiff, and r.in.gdal, if FALSE using r.out.bin or r.in.bin}
   \item{close_OK}{default TRUE - clean up possible open connections used for reading metadata; may be set to FALSE to avoid the side-effect of other user-opened connections being broken}
   \item{drivername}{default \code{"GTiff"}; a valid GDAL writable driver name to define the file format for intermediate files}
   \item{driverFileExt}{default NULL; otherwise string value of required driver file name extension}
