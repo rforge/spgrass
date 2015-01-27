@@ -16,8 +16,7 @@
 readVECT(vname, layer, type=NULL, plugin=get.pluginOption(), remove.duplicates = TRUE,
  ignore.stderr=get.ignore.stderrOption(), with_prj=TRUE, with_c=FALSE, mapset=NULL,
  pointDropZ=FALSE, driver="ESRI Shapefile")
-writeVECT(SDF, vname,  v.in.ogr_flags=NULL, ignore.stderr = NULL,
- driver="ESRI Shapefile")
+writeVECT(SDF, vname,  v.in.ogr_flags=NULL, ignore.stderr = get.ignore.stderrOption(), driver="ESRI Shapefile")
 vInfo(vname, layer, ignore.stderr = NULL)
 vColumns(vname, layer, ignore.stderr = NULL)
 vDataCount(vname, layer, ignore.stderr = NULL)
