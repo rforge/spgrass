@@ -1,12 +1,12 @@
-Package: spgrass
+Package: spgrass7
 Version: 0.1-0
 Date: 2015-01-15
-Title: Interface between GRASS 7+ geographical information system and R
+Title: Interface between GRASS 7 geographical information system and R
 Authors@R: c(
 	person("Roger", "Bivand", role = c("cre", "aut"), email = "Roger.Bivand@nhh.no"),
 	person("Rainer", "Krug", role = "ctb"),
 	person("Markus", "Neteler", role = "ctb"))
-Description: Interpreted interface between GRASS 7+ geographical 
+Description: Interpreted interface between GRASS 7 geographical 
     information system and R, based on starting R from within the GRASS 
     environment, or running free-standing R in a temporary GRASS location;
     the package provides facilities for using all GRASS commands from the 
