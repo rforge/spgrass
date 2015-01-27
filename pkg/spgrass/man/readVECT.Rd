@@ -13,8 +13,8 @@
   \code{readVECT} moves one GRASS 7 vector object file with attribute data through a temporary shapefile to a Spatial*DataFrame object of type determined by the GRASS 7 vector object; \code{writeVECT} moves a Spatial*DataFrame object through a temporary shapefile to a GRASS vector object file. \code{vect2neigh} returns neighbour pairs with shared boundary length as described by Markus Neteler, in \url{https://stat.ethz.ch/pipermail/r-sig-geo/2005-October/000616.html}. \code{cygwin_clean_temp} can be called to try to clean the GRASS mapset-specific temporary directory under cygwin.
 }
 \usage{
-readVECT(vname, layer, type=NULL, plugin=NULL, remove.duplicates = TRUE,
- ignore.stderr = NULL, with_prj=TRUE, with_c=FALSE, mapset=NULL,
+readVECT(vname, layer, type=NULL, plugin=get.pluginOption(), remove.duplicates = TRUE,
+ ignore.stderr=get.ignore.stderrOption(), with_prj=TRUE, with_c=FALSE, mapset=NULL,
  pointDropZ=FALSE, driver="ESRI Shapefile")
 writeVECT(SDF, vname,  v.in.ogr_flags=NULL, ignore.stderr = NULL,
  driver="ESRI Shapefile")
@@ -29,9 +29,10 @@ vect2neigh(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE, vname2=NULL,
   \item{vname}{A GRASS 7 vector file name}
   \item{layer}{a layer name (string); if missing set to default of \dQuote{1}}
   \item{type}{override type detection when multiple types are non-zero, passed to v.out.ogr}
-  \item{plugin}{default NULL for auto-detection, may be set to FALSE to avoid or TRUE if the plugin is known to be available; if the plugin is used, no further arguments other than mapset are respected}
+  \item{plugin}{default the value set by \code{set.pluginOption}; NULL for auto-detection, may be set to FALSE to avoid or TRUE if the plugin is known to be available; if the plugin is used, no further arguments other than mapset are respected}
   \item{remove.duplicates}{In line and area vector objects, multiple geometrical features may be associated with a single cat number, leading to duplication of data rows; this argument attempts to combine the geometrical features so that they match a single data row}
-  \item{ignore.stderr}{default NULL, taking the value set by \code{set.ignore.stderrOption}, can be set to TRUE to silence \code{system()} output to standard error; does not apply on Windows platforms}
+  \item{ignore.stderr}{default the value set by
+    \code{set.ignore.stderrOption}; NULL, taking the value set by \code{set.ignore.stderrOption}, can be set to TRUE to silence \code{system()} output to standard error; does not apply on Windows platforms}
   \item{with_prj}{default TRUE, write ESRI-style PRJ file for transfered data}
   \item{with_c}{default FALSE in GRASS 7; if FALSE, export features with category (labeled) only; if not default, all features are exported, including GRASS \dQuote{islands} which are probably spurious exterior rings filling holes.}
   \item{mapset}{if plugin is TRUE, the mapset of the file to be imported may be changed from the current mapset by passing a character string}
