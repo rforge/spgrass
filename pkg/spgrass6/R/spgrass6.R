@@ -156,3 +156,26 @@ getLocationProj <- function(ignore.stderr = FALSE) {
 }
 
 
+.grassVersion <- function(ignore.stderr=TRUE) {
+    Gver <- execGRASS(
+        "g.version",
+        intern = TRUE, 
+        ignore.stderr = ignore.stderr)
+    return(Gver)
+}
+
+.compatibleGRASSVersion <- function(gv=.grassVersion()) {
+    compatible <- ( (gv >= "GRASS 6.0") & (gv < "GRASS 7.0") )
+    if ( !compatible ){
+        attr(compatible, "message") <- paste0(
+            "\n### spgrass6 is not compatible with the GRASS GIS version '", gv, "'!",
+            "\n### Please use the package appropriate to the GRASS GIS version:",
+            "\n### GRASS GIS Version 5.x.y  --  GRASS",
+            "\n### GRASS GIS Version 6.x.y  --  spgrass6",
+            "\n### GRASS GIS Version 7.x.y  --  spgrass7"
+        )
+    } else {
+        attr(compatible, "message") <- paste0("spgrass7 is compatible with the GRASS GIS version '", gv, "' R is running in!")
+    }
+    return(compatible)
+}

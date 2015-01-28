@@ -60,8 +60,11 @@ if(!exists("Sys.setenv", envir = baseenv())) Sys.setenv <- Sys.putenv
   loc <- Sys.getenv("LOCATION_NAME")
   if (nchar(gisrc) == 0) gv <- "(GRASS not running)"
   else {
-      gv <- system(paste("g.version", get("addEXE", envir=.GRASS_CACHE),
-        sep=""),  intern=TRUE)
+      gv <- .grassVersion() #system(paste("g.version", get("addEXE", envir=.GRASS_CACHE),sep=""),  intern=TRUE)
+    comp <- .compatibleGRASSVersion(gv)
+    if ( !comp ){
+        stop( attr(comp, "message") )
+    }
     assign("GV", gv, envir=.GRASS_CACHE)
     if(nchar(loc) == 0) {
       gisrc <- ifelse(.Platform$OS.type == "windows" &&
