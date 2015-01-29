@@ -103,20 +103,25 @@ readVECT <- readVECT6 <- function(vname, layer, type=NULL, plugin=NULL,
             RDSN <- paste(rtmpfl1, shname, sep=.Platform$file.sep)
             LAYER <- shname
         }
-        execGRASS("v.out.ogr", flags=flags, input=vname,
-            type=type, layer=layer, dsn=GDSN, olayer=LAYER,
-            format=gsub(" ", "_", driver), ignore.stderr=ignore.stderr)
-
-        if (sss[1] >= "0.6" && as.integer(sss[2]) > 7) {
-	    res <- rgdal::readOGR(dsn=RDSN, layer=LAYER, verbose=!ignore.stderr, 
-	        pointDropZ=pointDropZ)
-        } else {
-	    res <- rgdal::readOGR(dsn=rtmpfl1, layer=shname, verbose=!ignore.stderr)           }
-
-	if (.Platform$OS.type != "windows") {
-            unlink(paste(rtmpfl1, list.files(rtmpfl1, pattern=shname), 
-	        sep=.Platform$file.sep))
-        }
+        tryCatch(
+            {
+                execGRASS("v.out.ogr", flags=flags, input=vname,
+                          type=type, layer=layer, dsn=GDSN, olayer=LAYER,
+                          format=gsub(" ", "_", driver), ignore.stderr=ignore.stderr)
+                
+                if (sss[1] >= "0.6" && as.integer(sss[2]) > 7) {
+                    res <- rgdal::readOGR(dsn=RDSN, layer=LAYER, verbose=!ignore.stderr, 
+                                          pointDropZ=pointDropZ)
+                } else {
+                    res <- rgdal::readOGR(dsn=rtmpfl1, layer=shname, verbose=!ignore.stderr)           }
+            },
+            finally = {
+                if (.Platform$OS.type != "windows") {
+                    unlink(paste(rtmpfl1, list.files(rtmpfl1, pattern=shname), 
+                                 sep=.Platform$file.sep))
+                }
+            }
+        )
         
 	if (remove.duplicates && type != "point") {
 		dups <- duplicated(slot(res, "data"))
