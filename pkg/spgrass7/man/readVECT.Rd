@@ -13,10 +13,12 @@
   \code{readVECT} moves one GRASS 7 vector object file with attribute data through a temporary shapefile to a Spatial*DataFrame object of type determined by the GRASS 7 vector object; \code{writeVECT} moves a Spatial*DataFrame object through a temporary shapefile to a GRASS vector object file. \code{vect2neigh} returns neighbour pairs with shared boundary length as described by Markus Neteler, in \url{https://stat.ethz.ch/pipermail/r-sig-geo/2005-October/000616.html}. \code{cygwin_clean_temp} can be called to try to clean the GRASS mapset-specific temporary directory under cygwin.
 }
 \usage{
-readVECT(vname, layer, type=NULL, plugin=get.pluginOption(), remove.duplicates = TRUE,
- ignore.stderr=get.ignore.stderrOption(), with_prj=TRUE, with_c=FALSE, mapset=NULL,
+readVECT(vname, layer, type=NULL, plugin=get.pluginOption(),
+ remove.duplicates = TRUE, ignore.stderr=get.ignore.stderrOption(),
+ with_prj=TRUE, with_c=FALSE, mapset=NULL,
  pointDropZ=FALSE, driver="ESRI Shapefile")
-writeVECT(SDF, vname,  v.in.ogr_flags=NULL, ignore.stderr = get.ignore.stderrOption(), driver="ESRI Shapefile")
+writeVECT(SDF, vname,  v.in.ogr_flags=NULL,
+ ignore.stderr = get.ignore.stderrOption(), driver="ESRI Shapefile")
 vInfo(vname, layer, ignore.stderr = NULL)
 vColumns(vname, layer, ignore.stderr = NULL)
 vDataCount(vname, layer, ignore.stderr = NULL)

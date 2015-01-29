@@ -28,7 +28,14 @@ set.useGDALOption <- function(value) {
 	if (!is.logical(value)) stop ("logical argument required")
 	res <- get("useGDAL", envir = .GRASS_CACHE)
 	assign("useGDAL", value, envir = .GRASS_CACHE)
-        if (value) require(rgdal)
+        if (value) {
+          if (requireNamespace("rgdal", quietly = TRUE)) {
+	    assign("useGDAL", value, envir = .GRASS_CACHE)
+          } else {
+            warning("rgdal not available")
+          }
+        }
+# require(rgdal)
 	res
 }
 

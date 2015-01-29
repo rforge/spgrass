@@ -10,10 +10,13 @@ Read GRASS 7 raster files from GRASS 7 into R SpatialGridDataFrame objects, and 
 
 
 \usage{
-readRAST(vname, cat=NULL, ignore.stderr = get.ignore.stderrOption(), NODATA=NULL, plugin=get.pluginOption(),
- mapset=NULL, useGDAL=get.useGDALOption(), close_OK=TRUE, drivername="GTiff",
+readRAST(vname, cat=NULL, ignore.stderr = get.ignore.stderrOption(),
+ NODATA=NULL, plugin=get.pluginOption(), mapset=NULL,
+ useGDAL=get.useGDALOption(), close_OK=TRUE, drivername="GTiff",
  driverFileExt=NULL, return_SGDF=TRUE)
-writeRAST(x, vname, zcol = 1, NODATA=NULL, ignore.stderr = get.ignore.stderrOption(), useGDAL=get.useGDALOption(), overwrite=FALSE, flags=NULL, drivername="GTiff")
+writeRAST(x, vname, zcol = 1, NODATA=NULL,
+ ignore.stderr = get.ignore.stderrOption(), useGDAL=get.useGDALOption(),
+ overwrite=FALSE, flags=NULL, drivername="GTiff")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
