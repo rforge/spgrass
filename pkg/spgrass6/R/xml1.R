@@ -51,16 +51,7 @@ parseGRASS <- function(cmd, legacyExec=NULL) {
                 prep <- paste("sh.exe ", Sys.getenv("GISBASE"),
                     "/scripts/", sep="")
         }
-        if ((get("SYS", envir=.GRASS_CACHE) == "WinNat") &&
-            length(grep("7", get("GV", envir=.GRASS_CACHE)) > 0)) {
-# Luke Winslow 130209
-            pyScripts <- get("pyScripts", envir=.GRASS_CACHE)
-            if (cmd %in% names(pyScripts)) {
-                ext <- ".py"
-                prep <- paste("\"", Sys.getenv("GRASS_PYTHON"), "\" ",
-                    "\"", Sys.getenv("GISBASE"), "/scripts/\"", sep="")
-            }            
-        }
+        
         cmd0 <- paste(paste(prep, cmd, ext, sep=""), "--interface-description")
         if (legacyExec) {
             tr <- try(system(cmd0, intern=TRUE))
@@ -211,7 +202,6 @@ doGRASS <- function(cmd, flags=NULL, ..., parameters=NULL, echoCmd=NULL, legacyE
         legacyExec <- TRUE
     }
 
-#    G6 <- get("GV", envir=.GRASS_CACHE) < "GRASS 7"
 
     dlist <- list(...)
     if (!is.null(parameters) && (length(dlist) > 0))

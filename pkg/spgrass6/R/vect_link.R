@@ -16,16 +16,13 @@ readVECT6 <- function(vname, layer, type=NULL, plugin=NULL,
     if (is.null(ignore.stderr))
         ignore.stderr <- get("ignore.stderr", envir = .GRASS_CACHE)
     stopifnot(is.logical(ignore.stderr))
-    G7 <- execGRASS("g.version", intern=TRUE) > "GRASS 7"
     if (missing(layer)) layer <- 1L
-    if (G7) layer <- as.character(layer)
 # 120908 emails Markus Neteler, Markus Metz, default TRUE before G7
     stopifnot(is.logical(with_c))
-    if (!G7) {
-      with_c <- !with_c
-      if (!ignore.stderr) 
-        message("with_c: argument reversed from version 0.7-11 and in GRASS 6")
-    }
+    with_c <- !with_c
+    if (!ignore.stderr) 
+      message("with_c: argument reversed from version 0.7-11 and in GRASS 6")
+
     if (driver == "GRASS") plugin <- TRUE
 
     if (requireNamespace("rgdal", quietly = TRUE)) {
@@ -322,9 +319,7 @@ vInfo <- function(vname, layer, ignore.stderr = NULL) {
             ignore.stderr <- get("ignore.stderr", envir = .GRASS_CACHE)
         stopifnot(is.logical(ignore.stderr))
 
-        G7 <- execGRASS("g.version", intern=TRUE) > "GRASS 7"
         if (missing(layer)) layer <- 1L
-        if (G7) layer <- as.character(layer)
 	vinfo0 <- execGRASS("v.info", flags="t", map=vname,
             layer=layer, intern=TRUE, ignore.stderr=ignore.stderr)
 
@@ -349,9 +344,7 @@ vColumns <- function(vname, layer, ignore.stderr = NULL) {
         if (is.null(ignore.stderr))
             ignore.stderr <- get("ignore.stderr", envir = .GRASS_CACHE)
         stopifnot(is.logical(ignore.stderr))
-        G7 <- execGRASS("g.version", intern=TRUE) > "GRASS 7"
         if (missing(layer)) layer <- 1L
-        if (G7) layer <- as.character(layer)
 	vinfo0 <- execGRASS("v.info", flags="c", map=vname,
             layer=layer, intern=TRUE, ignore.stderr=ignore.stderr)       
 	con <- textConnection(vinfo0)
@@ -373,9 +366,7 @@ vDataCount <- function(vname, layer, ignore.stderr = NULL) {
             ignore.stderr <- get("ignore.stderr", envir = .GRASS_CACHE)
         stopifnot(is.logical(ignore.stderr))
         column <- "column" %in% parseGRASS("v.db.select")$pnames
-        G7 <- execGRASS("g.version", intern=TRUE) > "GRASS 7"
         if (missing(layer)) layer <- 1L
-        if (G7) layer <- as.character(layer)
         parms <- list(map=vname, layer=layer, columns="cat")
         if (column) tull <- execGRASS("v.db.select", flags="c",
             parameters=parms, intern=TRUE, ignore.stderr=ignore.stderr)
