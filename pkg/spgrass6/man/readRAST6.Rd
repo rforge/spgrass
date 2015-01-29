@@ -1,19 +1,29 @@
 % Copyright (C) 2005-2012 Roger S. Bivand
-\name{readRAST6}
+\name{readRAST}
+\alias{readRAST}
 \alias{readRAST6}
+\alias{writeRAST}
 \alias{writeRAST6}
 \title{Read and write GRASS 6+ raster files}
 \description{
-Read GRASS 6+ raster files from GRASS 6+ into R SpatialGridDataFrame objects, and write single columns of R SpatialGridDataFrame objects to GRASS 6+. \code{readRAST6} and \code{writeRAST6} use temporary binary files and r.out.bin and r.in.bin rather than the temporary ASCII files used in earlier implementations. The earlier versions may still be used in a transition period. 
+Read GRASS 6+ raster files from GRASS 6+ into R SpatialGridDataFrame
+objects, and write single columns of R SpatialGridDataFrame objects to
+GRASS 6+. \code{readRAST} and \code{writeRAST} use temporary binary
+files and r.out.bin and r.in.bin rather than the temporary ASCII files
+used in earlier implementations. The earlier versions may still be used
+in a transition period.
+The functions \code{readRAST} and \code{readRAST6} as well as \code{writeRAST}
+and \code{writeRAST6} are identical and the functions ending with
+\code{...6} are maintained only for backward compatibility and might be deprecated.
 }
 
 
 
 \usage{
-readRAST6(vname, cat=NULL, ignore.stderr = NULL, NODATA=NULL, plugin=NULL,
+readRAST(vname, cat=NULL, ignore.stderr = NULL, NODATA=NULL, plugin=NULL,
  mapset=NULL, useGDAL=NULL, close_OK=TRUE, drivername="GTiff",
  driverFileExt=NULL, return_SGDF=TRUE)
-writeRAST6(x, vname, zcol = 1, NODATA=NULL, ignore.stderr = NULL,
+writeRAST(x, vname, zcol = 1, NODATA=NULL, ignore.stderr = NULL,
  useGDAL=NULL, overwrite=FALSE, flags=NULL, drivername="GTiff")
 }
 %- maybe also 'usage' for other objects documented here.
@@ -38,7 +48,7 @@ writeRAST6(x, vname, zcol = 1, NODATA=NULL, ignore.stderr = NULL,
 }
 
 \value{
-\code{readRAST6} returns a SpatialGridDataFrame objects with an data.frame in the data slots, and with the projection argument set. Note that the projection argument set is the the GRASS rendering of proj4, and will differ from the WKT/ESRI rendering returned by readVECT6 in form but not meaning. They are exchangeable but not textually identical, usually with the +ellps= term replaced by ellipsoid parameters verbatim. If return_SGDF is FALSE, a list with a \code{GridTopology} object, a list of bands, and a proj4string is returned, with an S3 class attribute of \dQuote{gridList}.
+\code{readRAST} returns a SpatialGridDataFrame objects with an data.frame in the data slots, and with the projection argument set. Note that the projection argument set is the the GRASS rendering of proj4, and will differ from the WKT/ESRI rendering returned by \code{readVECT} in form but not meaning. They are exchangeable but not textually identical, usually with the +ellps= term replaced by ellipsoid parameters verbatim. If return_SGDF is FALSE, a list with a \code{GridTopology} object, a list of bands, and a proj4string is returned, with an S3 class attribute of \dQuote{gridList}.
 }
 
 
@@ -50,9 +60,9 @@ if (nchar(Sys.getenv("GISRC")) > 0) {
   ois <- get.ignore.stderrOption()
   set.ignore.stderrOption(TRUE)
   get.useGDALOption()
-  spear <- readRAST6(c("geology", "elevation.dem"), cat=c(TRUE, FALSE),
+  spear <- readRAST(c("geology", "elevation.dem"), cat=c(TRUE, FALSE),
     useGDAL=FALSE)
-  spear <- readRAST6(c("geology", "elevation.dem"), cat=c(TRUE, FALSE),
+  spear <- readRAST(c("geology", "elevation.dem"), cat=c(TRUE, FALSE),
     useGDAL=TRUE)
   print(table(spear$geology))
   execGRASS("r.stats", flags=c("c", "l", "quiet"), input="geology")
@@ -60,22 +70,22 @@ if (nchar(Sys.getenv("GISRC")) > 0) {
   spear$sqdem <- sqrt(spear$elevation.dem)
   if ("GRASS" \%in\% gdalDrivers()$name) {
     execGRASS("g.region", rast="elevation.dem")
-    dem1 <- readRAST6("elevation.dem", plugin=TRUE, mapset="PERMANENT")
+    dem1 <- readRAST("elevation.dem", plugin=TRUE, mapset="PERMANENT")
     print(summary(dem1))
     execGRASS("g.region", rast="elevation.dem")
   }
-  writeRAST6(spear, "sqdemSP", zcol="sqdem")
+  writeRAST(spear, "sqdemSP", zcol="sqdem")
   execGRASS("r.info", map="sqdemSP")
   execGRASS("g.remove", rast="sqdemSP")
-  writeRAST6(spear, "sqdemSP", zcol="sqdem", useGDAL=TRUE)
+  writeRAST(spear, "sqdemSP", zcol="sqdem", useGDAL=TRUE)
   execGRASS("r.info", map="sqdemSP")
-  print(system.time(sqdemSP <- readRAST6(c("sqdemSP", "elevation.dem"),
+  print(system.time(sqdemSP <- readRAST(c("sqdemSP", "elevation.dem"),
     useGDAL=TRUE, return_SGDF=FALSE)))
-  print(system.time(sqdemSP <- readRAST6(c("sqdemSP", "elevation.dem"),
+  print(system.time(sqdemSP <- readRAST(c("sqdemSP", "elevation.dem"),
     useGDAL=TRUE, return_SGDF=TRUE)))
-  print(system.time(sqdemSP <- readRAST6(c("sqdemSP", "elevation.dem"),
+  print(system.time(sqdemSP <- readRAST(c("sqdemSP", "elevation.dem"),
     useGDAL=FALSE, return_SGDF=TRUE)))
-  print(system.time(sqdemSP <- readRAST6(c("sqdemSP", "elevation.dem"),
+  print(system.time(sqdemSP <- readRAST(c("sqdemSP", "elevation.dem"),
     useGDAL=FALSE, return_SGDF=FALSE)))
   str(sqdemSP)
   mat <- do.call("cbind", sqdemSP$dataList)
@@ -91,9 +101,9 @@ if (nchar(Sys.getenv("GISRC")) > 0) {
       amap="quads", formula='A - 1')
   }
   execGRASS("r.stats", flags="c", input="quads0")
-  quads0 <- readRAST6("quads0")
+  quads0 <- readRAST("quads0")
   print(table(quads0$quads0))
-  quads0 <- readRAST6("quads0", plugin=FALSE)
+  quads0 <- readRAST("quads0", plugin=FALSE)
   print(table(quads0$quads0))
   execGRASS("g.remove", rast="quads0")
   set.ignore.stderrOption(ois)

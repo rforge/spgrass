@@ -1,7 +1,8 @@
 # Interpreted GRASS 6+ interface functions
 # Copyright (c) 2005-2012 Roger S. Bivand
 #
-readVECT6 <- function(vname, layer, type=NULL, plugin=NULL,
+
+readVECT <- readVECT6 <- function(vname, layer, type=NULL, plugin=NULL,
         remove.duplicates=TRUE, 
 	ignore.stderr = NULL, with_prj=TRUE, with_c=FALSE, mapset=NULL, 
 	pointDropZ=FALSE, driver="ESRI Shapefile") {
@@ -34,7 +35,7 @@ readVECT6 <- function(vname, layer, type=NULL, plugin=NULL,
     if (plugin) {
         ogrD <- rgdal::ogrDrivers()$name
 	if (!("GRASS" %in% ogrD)) stop("no GRASS plugin driver")
-        gg <- gmeta6()
+        gg <- gmeta()
         if (is.null(mapset)) {
             c_at <- strsplit(vname[1], "@")[[1]]
             if (length(c_at) == 1) {
@@ -235,7 +236,7 @@ readVECT6 <- function(vname, layer, type=NULL, plugin=NULL,
     return(retval)
 }
 
-writeVECT6 <- function(SDF, vname, #factor2char = TRUE, 
+writeVECT <- writeVECT6 <- function(SDF, vname, #factor2char = TRUE, 
 	v.in.ogr_flags=NULL, ignore.stderr = NULL, driver="ESRI Shapefile") {
 
         if (get.suppressEchoCmdInFuncOption()) {

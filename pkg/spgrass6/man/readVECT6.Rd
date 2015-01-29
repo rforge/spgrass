@@ -1,7 +1,9 @@
 % Copyright (C) 2005-2010 Roger S. Bivand
 %
 \name{readVECT6}
+\alias{readVECT}
 \alias{readVECT6}
+\alias{writeVECT}
 \alias{writeVECT6}
 \alias{vInfo}
 \alias{vColumns}
@@ -15,13 +17,23 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Read and write GRASS 6+ vector object files}
 \description{
-  \code{readVECT6} moves one GRASS 6+ vector object file with attribute data through a temporary shapefile to a Spatial*DataFrame object of type determined by the GRASS 6+ vector object; \code{writeVECT6} moves a Spatial*DataFrame object through a temporary shapefile to a GRASS vector object file. \code{vect2neigh} returns neighbour pairs with shared boundary length as described by Markus Neteler, in \url{https://stat.ethz.ch/pipermail/r-sig-geo/2005-October/000616.html}. \code{cygwin_clean_temp} can be called to try to clean the GRASS mapset-specific temporary directory under cygwin.
+  \code{readVECT} moves one GRASS 6+ vector object file with attribute
+  data through a temporary shapefile to a Spatial*DataFrame object of
+  type determined by the GRASS 6+ vector object; \code{writeVECT} moves
+  a Spatial*DataFrame object through a temporary shapefile to a GRASS
+  vector object file. \code{vect2neigh} returns neighbour pairs with
+  shared boundary length as described by Markus Neteler, in
+  \url{https://stat.ethz.ch/pipermail/r-sig-geo/2005-October/000616.html}. \code{cygwin_clean_temp} can be called to try to clean the GRASS mapset-specific temporary directory under cygwin.
+  The functions \code{readVECT} and \code{readVECT6} as well as \code{writeVECT}
+and \code{writeVECT6} are identical and the functions ending with
+\code{...6} are maintained only for backward compatibility and might be deprecated.
+
 }
 \usage{
-readVECT6(vname, layer, type=NULL, plugin=NULL, remove.duplicates = TRUE,
+readVECT(vname, layer, type=NULL, plugin=NULL, remove.duplicates = TRUE,
  ignore.stderr = NULL, with_prj=TRUE, with_c=FALSE, mapset=NULL,
  pointDropZ=FALSE, driver="ESRI Shapefile")
-writeVECT6(SDF, vname,  v.in.ogr_flags=NULL, ignore.stderr = NULL,
+writeVECT(SDF, vname,  v.in.ogr_flags=NULL, ignore.stderr = NULL,
  driver="ESRI Shapefile")
 vInfo(vname, layer, ignore.stderr = NULL)
 vColumns(vname, layer, ignore.stderr = NULL)
@@ -58,7 +70,7 @@ vect2neigh(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE, vname2=NULL,
 %  \item{verbose}{TRUE, can be set to false}
 }
 \value{
-   \code{readVECT6} imports a GRASS6+ vector object into a Spatial*DataFrame object with the type determined by the type of the GRASS6 vector object; \code{getSites6} returns a data frame. \code{vect2neigh} returns a data frame object with left and right neighbours and boundary lengths, also given class GRASSneigh and spatial.neighbour (as used in spdep). The incantation to retrieve the neighbours list is \code{sn2listw(vect2neigh())$neighbours}, and to retrieve the boundary lengths: \code{sn2listw(vect2neigh())$weights}. The GRASSneigh object has two other useful attributes: external is a vector giving the length of shared boundary between each polygon and the external area, and total giving each polygon's total boundary length.
+   \code{readVECT} imports a GRASS6+ vector object into a Spatial*DataFrame object with the type determined by the type of the GRASS6 vector object; \code{vect2neigh} returns a data frame object with left and right neighbours and boundary lengths, also given class GRASSneigh and spatial.neighbour (as used in spdep). The incantation to retrieve the neighbours list is \code{sn2listw(vect2neigh())$neighbours}, and to retrieve the boundary lengths: \code{sn2listw(vect2neigh())$weights}. The GRASSneigh object has two other useful attributes: external is a vector giving the length of shared boundary between each polygon and the external area, and total giving each polygon's total boundary length.
 
 Note that GRASS6 vectors should be rebuilt by running \dQuote{v.build.all} in each mapset.
 }
@@ -80,20 +92,20 @@ if (nchar(Sys.getenv("GISRC")) > 0) {
     execGRASS("v.info", map="bugsites", layer=1L)
   }
   print(vInfo("bugsites"))
-  bugs <- readVECT6("bugsites", plugin=NULL)
+  bugs <- readVECT("bugsites", plugin=NULL)
   print(summary(bugs))
-  bugs1 <- readVECT6("bugsites", plugin=FALSE)
+  bugs1 <- readVECT("bugsites", plugin=FALSE)
   print(summary(bugs1))
-  writeVECT6(bugs, "newbugs", v.in.ogr_flags=c("o", "overwrite"))
+  writeVECT(bugs, "newbugs", v.in.ogr_flags=c("o", "overwrite"))
   if (execGRASS("g.version", intern=TRUE) > "GRASS 7") {
     execGRASS("v.info", map="newbugs", layer="1")
   } else {
     execGRASS("v.info", map="newbugs", layer=1L)
   }
-  nbugs <- readVECT6("newbugs")
+  nbugs <- readVECT("newbugs")
   print(summary(nbugs))
   print(vInfo("roads"))
-  roads <- readVECT6("roads")
+  roads <- readVECT("roads")
   print(summary(roads))
   set.ignore.stderrOption(ois)
 }

@@ -32,16 +32,16 @@ unlink_.gislock()
   \item{pid}{default \code{as.integer(round(runif(1, 1, 1000)))}, integer used to identify GIS_LOCK; the value here is arbitrary, but probably should be set correctly}
 }
 \details{
-  The function establishes an out-of-GRASS working environment providing GRASS commands with the environment variable support required, and may also provide a temporary location for use until the end of the running R session if the \code{home} argument is set to \code{tempdir()}, and the \code{gisDbase} argument is not given. Running \code{gmeta6} shows where the location is, should it be desired to archive it before leaving R.
+  The function establishes an out-of-GRASS working environment providing GRASS commands with the environment variable support required, and may also provide a temporary location for use until the end of the running R session if the \code{home} argument is set to \code{tempdir()}, and the \code{gisDbase} argument is not given. Running \code{gmeta} shows where the location is, should it be desired to archive it before leaving R.
 }
 \value{
-  The function runs \code{gmeta6} before returning the current values of the running GRASS session that it provides.
+  The function runs \code{gmeta} before returning the current values of the running GRASS session that it provides.
 }
 \note{If any package command fails with a UTF-8 error from the XML package, try using \code{setXMLencoding} to work around the problem that GRASS modules declare --interface-description output as UTF-8 without ensuring that it is (French is of 6.4.0 RC5 latin1).}
 
 \author{Roger S. Bivand, e-mail: \email{Roger.Bivand@nhh.no}}
 
-\seealso{\code{\link{gmeta6}}}
+\seealso{\code{\link{gmeta}}}
 \examples{
 \dontrun{
 initGRASS("/usr/bin/grass-6.4.4", home=tempdir())

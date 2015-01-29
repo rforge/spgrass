@@ -2,7 +2,7 @@
 # Copyright (c) 2005-8 Roger S. Bivand
 #
 
-gmeta6 <- function(ignore.stderr = FALSE) {
+gmeta <- gmeta6 <- function(ignore.stderr = FALSE) {
         if (get.suppressEchoCmdInFuncOption()) {
             inEchoCmd <- get.echoCmdOption()
              tull <- set.echoCmdOption(FALSE)
@@ -57,14 +57,14 @@ gmeta6 <- function(ignore.stderr = FALSE) {
 	glist <- as.list(sapply(gisenv, function(x) x[2]))
 	names(glist) <- sapply(gisenv, function(x) x[1])
 	lres <- c(glist, lres)
-	class(lres) <- "gmeta6"
+	class(lres) <- c("gmeta", "gmeta6")
         if (get.suppressEchoCmdInFuncOption()) {
             tull <- set.echoCmdOption(inEchoCmd)
         }
 	lres
 }
 
-print.gmeta6 <- function(x, ...) {
+print.gmeta <- function(x, ...) {
     cat("gisdbase   ", x$GISDBASE, "\n")
     cat("location   ", x$LOCATION_NAME, "\n")
     cat("mapset     ", x$MAPSET, "\n")
@@ -81,7 +81,7 @@ print.gmeta6 <- function(x, ...) {
 }
 
 gmeta2grd <- function(ignore.stderr = FALSE) {
-	G <- gmeta6(ignore.stderr=ignore.stderr)
+	G <- gmeta(ignore.stderr=ignore.stderr)
 	cellcentre.offset <- c(G$w+(G$ewres/2), G$s+(G$nsres/2))
 	cellsize <- c(G$ewres, G$nsres)
 	cells.dim <- c(G$cols, G$rows)
