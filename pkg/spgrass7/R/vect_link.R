@@ -75,126 +75,133 @@ readVECT <- function(vname, layer, type=NULL, plugin=get.pluginOption(),
 }
 
 ## internal function for reading vectors without plugin
-.read_vect_non_plugin <- function(vname, layer, type, remove.duplicates, sss, ignore.stderr, pointDropZ, driver, with_prj,with_c){
-        ogrD <- rgdal::ogrDrivers()$name
-	if (!(driver %in% ogrD))
-            stop(paste("Requested driver", driver, "not available in rgdal"))
-        ogrDGRASS <- execGRASS("v.in.ogr", flags="f", intern=TRUE,
-            ignore.stderr=ignore.stderr)
-        ogrDGRASSs <- strsplit(ogrDGRASS, ": ")
-        if (!(driver %in% sapply(ogrDGRASSs, "[", 2)))
-            stop(paste("Requested driver", driver, "not available in GRASS"))
-        fDrivers <- c("GML", "SQLite")
-        dDrivers <- c("ESRI_Shapefile", "MapInfo_File")
-        if (!(gsub(" ", "_", driver) %in% c(fDrivers, dDrivers)))
-            stop(paste("Requested driver", driver, "not supported"))
-        is_dDriver <- TRUE
-        if (gsub(" ", "_", driver) %in% fDrivers) is_dDriver <- FALSE
-	vinfo <- vInfo(vname)
-	types <- names(vinfo)[which(vinfo > 0)]
-	if (is.null(type)) {
-		if (length(grep("points", types)) > 0) type <- "point"
-		if (length(grep("lines", types)) > 0) type <- "line"
-		if (length(grep("areas", types)) > 0) type <- "area"
-		if (is.null(type)) stop("Vector type not found")
-	}
+.read_vect_non_plugin <- function(vname, layer, type, remove.duplicates, sss, ignore.stderr, pointDropZ, driver, with_prj,with_c)
+{
+    ogrD <- rgdal::ogrDrivers()$name
+    if (!(driver %in% ogrD))
+        stop(paste("Requested driver", driver, "not available in rgdal"))
+    ogrDGRASS <- execGRASS("v.in.ogr", flags="f", intern=TRUE,
+                           ignore.stderr=ignore.stderr)
+    ogrDGRASSs <- strsplit(ogrDGRASS, ": ")
+    if (!(driver %in% sapply(ogrDGRASSs, "[", 2)))
+        stop(paste("Requested driver", driver, "not available in GRASS"))
+    fDrivers <- c("GML", "SQLite")
+    dDrivers <- c("ESRI_Shapefile", "MapInfo_File")
+    if (!(gsub(" ", "_", driver) %in% c(fDrivers, dDrivers)))
+        stop(paste("Requested driver", driver, "not supported"))
+    is_dDriver <- TRUE
+    if (gsub(" ", "_", driver) %in% fDrivers) is_dDriver <- FALSE
+    vinfo <- vInfo(vname)
+    types <- names(vinfo)[which(vinfo > 0)]
+    if (is.null(type)) {
+        if (length(grep("points", types)) > 0) type <- "point"
+        if (length(grep("lines", types)) > 0) type <- "line"
+        if (length(grep("areas", types)) > 0) type <- "area"
+        if (is.null(type)) stop("Vector type not found")
+    }
 
-	pid <- as.integer(round(runif(1, 1, 1000)))
+    pid <- as.integer(round(runif(1, 1, 1000)))
 
-	gtmpfl1 <- dirname(execGRASS("g.tempfile", pid=pid,
-            intern=TRUE, ignore.stderr=ignore.stderr))
-	rtmpfl1 <- ifelse(.Platform$OS.type == "windows" &&
-                (Sys.getenv("OSTYPE") == "cygwin"), 
-		system(paste("cygpath -w", gtmpfl1, sep=" "), intern=TRUE), 
-		gtmpfl1)
+    gtmpfl1 <- dirname(execGRASS("g.tempfile", pid=pid,
+                                 intern=TRUE, ignore.stderr=ignore.stderr))
+    rtmpfl1 <- ifelse(.Platform$OS.type == "windows" &&
+                          (Sys.getenv("OSTYPE") == "cygwin"), 
+                      system(paste("cygpath -w", gtmpfl1, sep=" "), intern=TRUE), 
+                      gtmpfl1)
 
-	if (driver == "ESRI Shapefile") 
-	        shname <- substring(vname, 1, ifelse(nchar(vname) > 8, 8, 
-		nchar(vname)))
+    if (driver == "ESRI Shapefile") 
+        shname <- substring(vname, 1, ifelse(nchar(vname) > 8, 8, 
+                                             nchar(vname)))
+    
+    flags <- NULL
+    if (with_prj) flags <- "e"
+    if (with_c) flags <- c(flags, "c")
+    if (is_dDriver){
+        GDSN <- gtmpfl1
+        RDSN <- rtmpfl1
+        LAYER <- shname
+    } else {
+        GDSN <- paste(gtmpfl1, shname, sep=.Platform$file.sep)
+        RDSN <- paste(rtmpfl1, shname, sep=.Platform$file.sep)
+        LAYER <- shname
+    }
+    tryCatch(
+        {
+            execGRASS("v.out.ogr", flags=flags, input=vname,
+                      type=type, layer=layer, output=GDSN, output_layer=LAYER,
+                      format=gsub(" ", "_", driver), ignore.stderr=ignore.stderr)
 
-        flags <- NULL
-        if (with_prj) flags <- "e"
-        if (with_c) flags <- c(flags, "c")
-        if (is_dDriver){
-            GDSN <- gtmpfl1
-            RDSN <- rtmpfl1
-            LAYER <- shname
-        } else {
-            GDSN <- paste(gtmpfl1, shname, sep=.Platform$file.sep)
-            RDSN <- paste(rtmpfl1, shname, sep=.Platform$file.sep)
-            LAYER <- shname
+            if (sss[1] >= "0." && as.integer(sss[2]) > 7) {
+                res <- rgdal::readOGR(dsn=RDSN, layer=LAYER, verbose=!ignore.stderr, 
+                                      pointDropZ=pointDropZ)
+            } else {
+                res <- rgdal::readOGR(dsn=rtmpfl1, layer=shname, verbose=!ignore.stderr)
+            }
+        },
+        finally = {
+            if (.Platform$OS.type != "windows") {
+                unlink(paste(rtmpfl1, list.files(rtmpfl1, pattern=shname), 
+                             sep=.Platform$file.sep))
+            }
         }
-        execGRASS("v.out.ogr", flags=flags, input=vname,
-            type=type, layer=layer, output=GDSN, output_layer=LAYER,
-            format=gsub(" ", "_", driver), ignore.stderr=ignore.stderr)
-
-        if (sss[1] >= "0." && as.integer(sss[2]) > 7) {
-	    res <- rgdal::readOGR(dsn=RDSN, layer=LAYER, verbose=!ignore.stderr, 
-	        pointDropZ=pointDropZ)
-        } else {
-	    res <- rgdal::readOGR(dsn=rtmpfl1, layer=shname, verbose=!ignore.stderr)           }
-
-	if (.Platform$OS.type != "windows") {
-            unlink(paste(rtmpfl1, list.files(rtmpfl1, pattern=shname), 
-	        sep=.Platform$file.sep))
+    )
+    
+    if (remove.duplicates && type != "point") {
+        dups <- duplicated(slot(res, "data"))
+        if (any(dups)) {
+            if (length(grep("line", type)) > 0) type <- "line"
+            if (length(grep("area", type)) > 0) type <- "area"
+            if (type != "area" && type != "line")
+                stop("try remove.duplicates=FALSE")
+            ndata <- as(res, "data.frame")[!dups,,drop=FALSE]
+            cand <- as.character(ndata$cat)
+            cand[is.na(cand)] <- "na"
+            row.names(ndata) <- cand
+            if (type == "area") {
+                pls <- slot(res, "polygons")
+            } else if (type == "line") {
+                pls <- slot(res, "lines")
+            }
+            p4s <- proj4string(res)
+            IDs <- as.character(res$cat)
+            IDs[is.na(IDs)] <- "na"
+            tab <- table(factor(IDs))
+            n <- length(tab)
+            if (n + sum(dups) != length(pls))
+                stop("length mismatch in duplicate removal")
+            IDss <- .mixedsort(names(tab))
+            reg <- match(IDs, IDss)
+            belongs <- lapply(1:n, function(x) which(x == reg))
+            npls <- vector(mode="list", length=n)
+            for (i in 1:n) {
+                nParts <- length(belongs[[i]])
+                srl <- NULL
+                for (j in 1:nParts) {
+                    plij <- pls[[belongs[[i]][j]]]
+                    if (type == "area") {
+                        plijp <- slot(plij, "Polygons")
+                    } else if (type == "line") {
+                        plijp <- slot(plij, "Lines")
+                    }
+                    srl <- c(srl, plijp)
+                }
+                if (type == "area") {
+                    npls[[i]] <- Polygons(srl, ID=IDss[i])
+                } else if (type == "line") {
+                    npls[[i]] <- Lines(srl, ID=IDss[i])
+                }
+            }
+            if (type == "area") {
+                SP <- SpatialPolygons(npls, proj4string=CRS(p4s))
+                res <- SpatialPolygonsDataFrame(SP, ndata)
+            } else if (type == "line") {
+                SP <- SpatialLines(npls, proj4string=CRS(p4s))
+                res <- SpatialLinesDataFrame(SP, ndata)
+            }
         }
-        
-	if (remove.duplicates && type != "point") {
-		dups <- duplicated(slot(res, "data"))
-		if (any(dups)) {
-			if (length(grep("line", type)) > 0) type <- "line"
-			if (length(grep("area", type)) > 0) type <- "area"
-			if (type != "area" && type != "line")
-			    stop("try remove.duplicates=FALSE")
-			ndata <- as(res, "data.frame")[!dups,,drop=FALSE]
-                        cand <- as.character(ndata$cat)
-                        cand[is.na(cand)] <- "na"
-			row.names(ndata) <- cand
-			if (type == "area") {
-				pls <- slot(res, "polygons")
-			} else if (type == "line") {
-				pls <- slot(res, "lines")
-			}
-			p4s <- proj4string(res)
-			IDs <- as.character(res$cat)
-			IDs[is.na(IDs)] <- "na"
-			tab <- table(factor(IDs))
-			n <- length(tab)
-			if (n + sum(dups) != length(pls))
-				stop("length mismatch in duplicate removal")
-			IDss <- .mixedsort(names(tab))
-			reg <- match(IDs, IDss)
-			belongs <- lapply(1:n, function(x) which(x == reg))
-			npls <- vector(mode="list", length=n)
-			for (i in 1:n) {
-				nParts <- length(belongs[[i]])
-				srl <- NULL
-				for (j in 1:nParts) {
-					plij <- pls[[belongs[[i]][j]]]
-					if (type == "area") {
-						plijp <- slot(plij, "Polygons")
-					} else if (type == "line") {
-						plijp <- slot(plij, "Lines")
-					}
-					srl <- c(srl, plijp)
-				}
-				if (type == "area") {
-				    npls[[i]] <- Polygons(srl, ID=IDss[i])
-				} else if (type == "line") {
-				    npls[[i]] <- Lines(srl, ID=IDss[i])
-				}
-			}
-			if (type == "area") {
-			    SP <- SpatialPolygons(npls, proj4string=CRS(p4s))
-			    res <- SpatialPolygonsDataFrame(SP, ndata)
-			} else if (type == "line") {
-			    SP <- SpatialLines(npls, proj4string=CRS(p4s))
-			    res <- SpatialLinesDataFrame(SP, ndata)
-			}
-		}
 
-	}
-         return(res)
+    }
+    return(res)
 }
 
 # Function mixedorder copied from gtools 2.2.3 LGPL Gregory R. Warnes
