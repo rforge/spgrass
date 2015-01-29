@@ -310,19 +310,23 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
                 RDSN <- paste(rtmpfl1, shname, sep=.Platform$file.sep)
                 LAYER <- shname
             }
-
-            rgdal::writeOGR(SDF, dsn=RDSN, layer=LAYER, driver=driver,
-                            overwrite_layer=TRUE)
-
-
-            execGRASS("v.in.ogr", flags=v.in.ogr_flags,
-                      input=GDSN, output=vname, layer=LAYER,
-                      ignore.stderr=ignore.stderr)
-
-            if (.Platform$OS.type != "windows") {
-                unlink(paste(rtmpfl1, list.files(rtmpfl1, pattern=shname), 
-                             sep=.Platform$file.sep))
-            }
+            tryCatch(
+                {
+                    rgdal::writeOGR(SDF, dsn=RDSN, layer=LAYER, driver=driver,
+                                    overwrite_layer=TRUE)
+                    
+                    
+                    execGRASS("v.in.ogr", flags=v.in.ogr_flags,
+                              input=GDSN, output=vname, layer=LAYER,
+                              ignore.stderr=ignore.stderr)
+                },
+                finally = {
+                    if (.Platform$OS.type != "windows") {
+                        unlink(paste(rtmpfl1, list.files(rtmpfl1, pattern=shname), 
+                                     sep=.Platform$file.sep))
+                    }
+                }
+            )
         },
         finally = {
             if (get.suppressEchoCmdInFuncOption()) {

@@ -124,25 +124,29 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = get.ignore.stderrOption(),
                         if (to_int) rOutBinFlags <- c(rOutBinFlags, "i")
                         else rOutBinFlags <- c(rOutBinFlags, "f")
                         rOutBinBytes <- 4L
-                        if (Dcell) rOutBinBytes <- 8L
+                if (Dcell) rOutBinBytes <- 8L
+                tryCatch(
+                    {
 		        execGRASS("r.out.bin", flags=rOutBinFlags, 
-			    input=vname[i], output=gtmpfl11, bytes=rOutBinBytes,
-			    null=as.integer(NODATA),
-                            ignore.stderr=ignore.stderr)
-
-                    gdal_info <- bin_gdal_info(rtmpfl11, to_int)
-
-  	            what <- ifelse(to_int, "integer", "double")
-	            n <- gdal_info[1] * gdal_info[2]
-	            size <- gdal_info[10]/8
-
-		    reslist[[i]] <- readBinGridData(rtmpfl11, what=what,
-                        n=n, size=size, endian=attr(gdal_info, "endian"),
-                        nodata=attr(gdal_info, "nodata"))
-
-		    unlink(paste(rtmpfl1, list.files(rtmpfl1,
-                        pattern=vname[i]), sep=.Platform$file.sep))
-
+                                  input=vname[i], output=gtmpfl11, bytes=rOutBinBytes,
+                                  null=as.integer(NODATA),
+                                  ignore.stderr=ignore.stderr)
+                        
+                        gdal_info <- bin_gdal_info(rtmpfl11, to_int)
+                        
+                        what <- ifelse(to_int, "integer", "double")
+                        n <- gdal_info[1] * gdal_info[2]
+                        size <- gdal_info[10]/8
+                        
+                        reslist[[i]] <- readBinGridData(rtmpfl11, what=what,
+                                                        n=n, size=size, endian=attr(gdal_info, "endian"),
+                                                        nodata=attr(gdal_info, "nodata"))
+                    },
+                    finally = {
+                        unlink(paste(rtmpfl1, list.files(rtmpfl1,
+                                                         pattern=vname[i]), sep=.Platform$file.sep))
+                    }
+                )
 
 #		if (i == 1) resa <- res
 #		else {
@@ -396,20 +400,25 @@ writeRAST <- function(x, vname, zcol = 1, NODATA=NULL,
                     stop("only numeric columns may be exported")
                 if (overwrite && !("overwrite" %in% flags))
                     flags <- c(flags, "overwrite")
-                res <- writeBinGrid(x, rtmpfl11, attr = zcol, na.value = NODATA)
-                
-                flags <- c(res$flag, flags)
-                
-                execGRASS("r.in.bin", flags=flags,
-                          input=gtmpfl11,
-                          output=vname, bytes=as.integer(res$bytes), 
-                          north=as.numeric(res$north), south=as.numeric(res$south), 
-                          east=as.numeric(res$east), west=as.numeric(res$west), 
-                          rows=as.integer(res$rows), cols=as.integer(res$cols), 
-                          anull=as.numeric(res$anull), ignore.stderr=ignore.stderr)
-                
-                unlink(paste(rtmpfl1, list.files(rtmpfl1, pattern=fid), 
-                             sep=.Platform$file.sep))
+                tryCatch(
+                    {
+                        res <- writeBinGrid(x, rtmpfl11, attr = zcol, na.value = NODATA)
+                        
+                        flags <- c(res$flag, flags)
+                        
+                        execGRASS("r.in.bin", flags=flags,
+                                  input=gtmpfl11,
+                                  output=vname, bytes=as.integer(res$bytes), 
+                                  north=as.numeric(res$north), south=as.numeric(res$south), 
+                                  east=as.numeric(res$east), west=as.numeric(res$west), 
+                                  rows=as.integer(res$rows), cols=as.integer(res$cols), 
+                                  anull=as.numeric(res$anull), ignore.stderr=ignore.stderr)
+                    },
+                    finally = {
+                        unlink(paste(rtmpfl1, list.files(rtmpfl1, pattern=fid), 
+                                     sep=.Platform$file.sep))
+                    }
+                )
             },
             finally = {
                 if (get.suppressEchoCmdInFuncOption()) {

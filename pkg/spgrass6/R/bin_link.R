@@ -83,7 +83,8 @@ readRAST <- readRAST6 <- function(vname, cat=NULL, ignore.stderr = NULL,
 			warning("NODATA rounded to integer")
 		    NODATA <- round(NODATA)
 		}
-		if (useGDAL && G63) {
+
+                 if (useGDAL && G63) {
                   if (requireNamespace("rgdal", quietly = TRUE)) {
 
                     gdalDGRASS <- execGRASS("r.out.gdal", flags="l",
@@ -144,36 +145,41 @@ readRAST <- readRAST6 <- function(vname, cat=NULL, ignore.stderr = NULL,
 		      }
                     }
                     rOutBinFlags <- "b"
+                    tryCatch(
+                        {
 # 120118 Rainer Krug
-                    if (Gver < "GRASS 6.4.2") {
-                        if (to_int) rOutBinFlags <- c(rOutBinFlags, "i")
-		        execGRASS("r.out.bin", flags=rOutBinFlags, 
-			    input=vname[i], output=gtmpfl11,
-			    null=as.integer(NODATA),
-                            ignore.stderr=ignore.stderr)
-                    } else {
-                        if (to_int) rOutBinFlags <- c(rOutBinFlags, "i")
-                        else rOutBinFlags <- c(rOutBinFlags, "f")
-                        rOutBinBytes <- 4L
-                        if (Dcell) rOutBinBytes <- 8L
-		        execGRASS("r.out.bin", flags=rOutBinFlags, 
-			    input=vname[i], output=gtmpfl11, bytes=rOutBinBytes,
-			    null=as.integer(NODATA),
-                            ignore.stderr=ignore.stderr)
-                    }
-
-                    gdal_info <- bin_gdal_info(rtmpfl11, to_int)
-
-  	            what <- ifelse(to_int, "integer", "double")
-	            n <- gdal_info[1] * gdal_info[2]
-	            size <- gdal_info[10]/8
-
-		    reslist[[i]] <- readBinGridData(rtmpfl11, what=what,
-                        n=n, size=size, endian=attr(gdal_info, "endian"),
-                        nodata=attr(gdal_info, "nodata"))
-
-		    unlink(paste(rtmpfl1, list.files(rtmpfl1,
-                        pattern=vname[i]), sep=.Platform$file.sep))
+                            if (Gver < "GRASS 6.4.2") {
+                                if (to_int) rOutBinFlags <- c(rOutBinFlags, "i")
+                                execGRASS("r.out.bin", flags=rOutBinFlags, 
+                                          input=vname[i], output=gtmpfl11,
+                                          null=as.integer(NODATA),
+                                          ignore.stderr=ignore.stderr)
+                            } else {
+                                if (to_int) rOutBinFlags <- c(rOutBinFlags, "i")
+                                else rOutBinFlags <- c(rOutBinFlags, "f")
+                                rOutBinBytes <- 4L
+                                if (Dcell) rOutBinBytes <- 8L
+                                execGRASS("r.out.bin", flags=rOutBinFlags, 
+                                          input=vname[i], output=gtmpfl11, bytes=rOutBinBytes,
+                                          null=as.integer(NODATA),
+                                          ignore.stderr=ignore.stderr)
+                            }
+                            
+                            gdal_info <- bin_gdal_info(rtmpfl11, to_int)
+                            
+                            what <- ifelse(to_int, "integer", "double")
+                            n <- gdal_info[1] * gdal_info[2]
+                            size <- gdal_info[10]/8
+                            
+                            reslist[[i]] <- readBinGridData(rtmpfl11, what=what,
+                                                            n=n, size=size, endian=attr(gdal_info, "endian"),
+                                                            nodata=attr(gdal_info, "nodata"))
+                        },
+                        finally = {
+                            unlink(paste(rtmpfl1, list.files(rtmpfl1,
+                                                             pattern=vname[i]), sep=.Platform$file.sep))
+                        }
+                    )
 		}
 
 
@@ -486,17 +492,21 @@ writeRAST <- writeRAST6 <- function(x, vname, zcol = 1, NODATA=NULL,
 	    res <- writeBinGrid(x, rtmpfl11, attr = zcol, na.value = NODATA)
 
 	    flags <- c(res$flag, flags)
-	    
-	    execGRASS("r.in.bin", flags=flags,
-                input=gtmpfl11,
-		output=vname, bytes=as.integer(res$bytes), 
-		north=as.numeric(res$north), south=as.numeric(res$south), 
-		east=as.numeric(res$east), west=as.numeric(res$west), 
-		rows=as.integer(res$rows), cols=as.integer(res$cols), 
-		anull=as.numeric(res$anull), ignore.stderr=ignore.stderr)
-
-	    unlink(paste(rtmpfl1, list.files(rtmpfl1, pattern=fid), 
-		sep=.Platform$file.sep))
+	    tryCatch(
+                {
+                    execGRASS("r.in.bin", flags=flags,
+                              input=gtmpfl11,
+                              output=vname, bytes=as.integer(res$bytes), 
+                              north=as.numeric(res$north), south=as.numeric(res$south), 
+                              east=as.numeric(res$east), west=as.numeric(res$west), 
+                              rows=as.integer(res$rows), cols=as.integer(res$cols), 
+                              anull=as.numeric(res$anull), ignore.stderr=ignore.stderr)
+                },
+                finally = {
+                    unlink(paste(rtmpfl1, list.files(rtmpfl1, pattern=fid), 
+                                 sep=.Platform$file.sep))
+                }
+            )
 	}
         if (get.suppressEchoCmdInFuncOption()) {
             tull <- set.echoCmdOption(inEchoCmd)
