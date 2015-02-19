@@ -1,4 +1,4 @@
-Package: spgrass7
+Package: rgrass7
 Version: 0.1-0
 Date: 2015-01-15
 Title: Interface between GRASS 7 Geographical Information System and R
@@ -17,4 +17,4 @@ Suggests: rgdal (>= 0.8-8)
 SystemRequirements: GRASS (>= 7)
 License: GPL (>= 2)
 URL: http://grass.osgeo.org/
-Collate: AAA.R options.R spgrass.R bin_link.R vect_link.R initGRASS.R xml1.R
+Collate: AAA.R options.R rgrass.R bin_link.R vect_link.R initGRASS.R xml1.R

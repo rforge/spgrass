@@ -1,6 +1,6 @@
-\name{spgrass-package}
-\alias{spgrass-package}
-\alias{spgrass}
+\name{rgrass7-package}
+\alias{rgrass7-package}
+\alias{rgrass7}
 \docType{package}
 \title{
 Interface between GRASS geographical information system and R
@@ -27,7 +27,7 @@ vColumns                return vector database columns information
 vDataCount              return count of vector database rows
 vect2neigh              return area neighbours with shared boundary length
 }
-Further information may be found in the document \code{doc/spgrass_0.3.pdf} in the directory returned by \code{system.file("", package="spgrass")}.
+Further information may be found in the document \code{doc/spgrass_0.3.pdf} in the directory returned by \code{system.file("", package="rgrass7")}.
 }
 \author{
 Roger Bivand
