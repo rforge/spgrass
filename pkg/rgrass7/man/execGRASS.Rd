@@ -52,7 +52,8 @@ setXMLencoding(enc)
 \seealso{\code{\link[base]{system}}}
 
 \examples{
-if (nchar(Sys.getenv("GISRC")) > 0) {
+if (nchar(Sys.getenv("GISRC")) > 0 &&
+  read.dcf(Sys.getenv("GISRC"))[1,"LOCATION_NAME"] == "nc_basic_spm_grass7") {
   oechoCmd <- get.echoCmdOption()
   set.echoCmdOption(TRUE)
   print(parseGRASS("r.slope.aspect"))

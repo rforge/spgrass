@@ -27,7 +27,7 @@ vColumns                return vector database columns information
 vDataCount              return count of vector database rows
 vect2neigh              return area neighbours with shared boundary length
 }
-Further information may be found in the document \code{doc/spgrass_0.3.pdf} in the directory returned by \code{system.file("", package="rgrass7")}.
+Note that the examples now use the smaller subset North Carolina location: \url{http://grass.osgeo.org/sampledata/north_carolina/nc_basic_spm_grass7.tar.gz}
 }
 \author{
 Roger Bivand
@@ -41,7 +41,8 @@ Maintainer: Roger Bivand <Roger.Bivand@nhh.no>
 
 
 \examples{
-if (nchar(Sys.getenv("GISRC")) > 0) {
+if (nchar(Sys.getenv("GISRC")) > 0 &&
+  read.dcf(Sys.getenv("GISRC"))[1,"LOCATION_NAME"] == "nc_basic_spm_grass7") {
   require(rgdal)
   elevation <- readRAST("elevation", ignore.stderr=TRUE, plugin=FALSE)
   summary(elevation)

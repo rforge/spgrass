@@ -58,7 +58,8 @@ Please note that the OGR drivers used may not handle missing data gracefully. Fr
 \author{Roger S. Bivand, e-mail: \email{Roger.Bivand@nhh.no.}}
 
 \examples{
-if (nchar(Sys.getenv("GISRC")) > 0) {
+if (nchar(Sys.getenv("GISRC")) > 0 &&
+  read.dcf(Sys.getenv("GISRC"))[1,"LOCATION_NAME"] == "nc_basic_spm_grass7") {
   GV <- Sys.getenv("GRASS_VERBOSE")
   Sys.setenv("GRASS_VERBOSE"=0)
   require(rgdal)
