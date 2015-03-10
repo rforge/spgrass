@@ -59,30 +59,25 @@ Please note that the OGR drivers used may not handle missing data gracefully. Fr
 
 \examples{
 if (nchar(Sys.getenv("GISRC")) > 0) {
+  GV <- Sys.getenv("GRASS_VERBOSE")
+  Sys.setenv("GRASS_VERBOSE"=0)
   require(rgdal)
   ois <- get.ignore.stderrOption()
   set.ignore.stderrOption(TRUE)
-  if (execGRASS("g.version", intern=TRUE) > "GRASS 7") {
-    execGRASS("v.info", map="bugsites", layer="1")
-  } else {
-    execGRASS("v.info", map="bugsites", layer=1L)
-  }
-  print(vInfo("bugsites"))
-  bugs <- readVECT("bugsites", plugin=NULL)
-  print(summary(bugs))
-  bugs1 <- readVECT("bugsites", plugin=FALSE)
-  print(summary(bugs1))
-  writeVECT(bugs, "newbugs", v.in.ogr_flags=c("o", "overwrite"))
-  if (execGRASS("g.version", intern=TRUE) > "GRASS 7") {
-    execGRASS("v.info", map="newbugs", layer="1")
-  } else {
-    execGRASS("v.info", map="newbugs", layer=1L)
-  }
-  nbugs <- readVECT("newbugs")
-  print(summary(nbugs))
-  print(vInfo("roads"))
-  roads <- readVECT("roads")
+  execGRASS("v.info", map="schools", layer="1")
+  print(vInfo("schools"))
+  schs <- readVECT("schools", plugin=NULL)
+  print(summary(schs))
+  schs1 <- readVECT("schools", plugin=FALSE)
+  print(summary(schs1))
+  writeVECT(schs, "newsch", v.in.ogr_flags=c("o", "overwrite"))
+  execGRASS("v.info", map="newsch", layer="1")
+  nschs <- readVECT("newsch")
+  print(summary(nschs))
+  print(vInfo("roadsmajor"))
+  roads <- readVECT("roadsmajor")
   print(summary(roads))
+  Sys.setenv("GRASS_VERBOSE"=GV)
   set.ignore.stderrOption(ois)
 }
 }

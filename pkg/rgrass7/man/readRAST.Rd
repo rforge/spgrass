@@ -49,36 +49,38 @@ writeRAST(x, vname, zcol = 1, NODATA=NULL,
 
 \examples{
 if (nchar(Sys.getenv("GISRC")) > 0) {
+  GV <- Sys.getenv("GRASS_VERBOSE")
+  Sys.setenv("GRASS_VERBOSE"=0)
   require(rgdal)
   ois <- get.ignore.stderrOption()
   set.ignore.stderrOption(TRUE)
   get.useGDALOption()
-  spear <- readRAST(c("geology", "elevation.dem"), cat=c(TRUE, FALSE),
+  nc_basic <- readRAST(c("geology", "elevation"), cat=c(TRUE, FALSE),
     useGDAL=FALSE)
-  spear <- readRAST(c("geology", "elevation.dem"), cat=c(TRUE, FALSE),
+  nc_basic <- readRAST(c("geology", "elevation"), cat=c(TRUE, FALSE),
     useGDAL=TRUE)
-  print(table(spear$geology))
+  print(table(nc_basic$geology))
   execGRASS("r.stats", flags=c("c", "l", "quiet"), input="geology")
-  boxplot(spear$elevation.dem ~ spear$geology)
-  spear$sqdem <- sqrt(spear$elevation.dem)
+  boxplot(nc_basic$elevation ~ nc_basic$geology)
+  nc_basic$sqdem <- sqrt(nc_basic$elevation)
   if ("GRASS" \%in\% gdalDrivers()$name) {
-    execGRASS("g.region", raster="elevation.dem")
-    dem1 <- readRAST("elevation.dem", plugin=TRUE, mapset="PERMANENT")
+    execGRASS("g.region", raster="elevation")
+    dem1 <- readRAST("elevation", plugin=TRUE, mapset="PERMANENT")
     print(summary(dem1))
-    execGRASS("g.region", raster="elevation.dem")
+    execGRASS("g.region", raster="elevation")
   }
-  writeRAST(spear, "sqdemSP", zcol="sqdem")
+  writeRAST(nc_basic, "sqdemSP", zcol="sqdem", flags="quiet")
   execGRASS("r.info", map="sqdemSP")
   execGRASS("g.remove", flags="f", name="sqdemSP", type="raster")
-  writeRAST(spear, "sqdemSP", zcol="sqdem", useGDAL=TRUE)
+  writeRAST(nc_basic, "sqdemSP", zcol="sqdem", useGDAL=TRUE, flags="quiet")
   execGRASS("r.info", map="sqdemSP")
-  print(system.time(sqdemSP <- readRAST(c("sqdemSP", "elevation.dem"),
+  print(system.time(sqdemSP <- readRAST(c("sqdemSP", "elevation"),
     useGDAL=TRUE, return_SGDF=FALSE)))
-  print(system.time(sqdemSP <- readRAST(c("sqdemSP", "elevation.dem"),
+  print(system.time(sqdemSP <- readRAST(c("sqdemSP", "elevation"),
     useGDAL=TRUE, return_SGDF=TRUE)))
-  print(system.time(sqdemSP <- readRAST(c("sqdemSP", "elevation.dem"),
+  print(system.time(sqdemSP <- readRAST(c("sqdemSP", "elevation"),
     useGDAL=FALSE, return_SGDF=TRUE)))
-  print(system.time(sqdemSP <- readRAST(c("sqdemSP", "elevation.dem"),
+  print(system.time(sqdemSP <- readRAST(c("sqdemSP", "elevation"),
     useGDAL=FALSE, return_SGDF=FALSE)))
   str(sqdemSP)
   mat <- do.call("cbind", sqdemSP$dataList)
@@ -87,13 +89,14 @@ if (nchar(Sys.getenv("GISRC")) > 0) {
     proj4string=sqdemSP$proj4string, data=as.data.frame(sqdemSP$dataList))))
   summary(SGDF)
   execGRASS("g.remove", flags="f", name="sqdemSP", type="raster")
-  execGRASS("r.mapcalc", expression="quads0 = quads - 1")
-  execGRASS("r.stats", flags="c", input="quads0")
-  quads0 <- readRAST("quads0")
-  print(table(quads0$quads0))
-  quads0 <- readRAST("quads0", plugin=FALSE)
-  print(table(quads0$quads0))
-  execGRASS("g.remove", flags="f", name="quads0", type="raster")
+  execGRASS("r.mapcalc", expression="basins0 = basins - 1")
+  execGRASS("r.stats", flags="c", input="basins0")
+  basins0 <- readRAST("basins0")
+  print(table(basins0$basins0))
+  basins0 <- readRAST("basins0", plugin=FALSE)
+  print(table(basins0$basins0))
+  execGRASS("g.remove", flags="f", name="basins0", type="raster")
+  Sys.setenv("GRASS_VERBOSE"=GV)
   set.ignore.stderrOption(ois)
 }
 }

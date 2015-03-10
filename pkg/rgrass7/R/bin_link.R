@@ -204,6 +204,10 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = get.ignore.stderrOption(),
 					catnos <- catnos[-isNA]
 					catlabs <- catlabs[-isNA]
 				}
+                                if (length(catlabs) > length(unique(catlabs))) {
+                                    catlabs <- paste(catlabs, catnos, sep="_")
+                                    warning("non-unique factor labels")
+                                }
 				resa@data[[i]] <- factor(resa@data[[i]], 
 					levels=catnos, labels=catlabs)
 			}

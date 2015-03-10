@@ -43,21 +43,21 @@ Maintainer: Roger Bivand <Roger.Bivand@nhh.no>
 \examples{
 if (nchar(Sys.getenv("GISRC")) > 0) {
   require(rgdal)
-  soilsph <- readRAST("soils.ph", ignore.stderr=TRUE, plugin=FALSE)
-  summary(soilsph)
+  elevation <- readRAST("elevation", ignore.stderr=TRUE, plugin=FALSE)
+  summary(elevation)
   grd <- gmeta2grd(ignore.stderr=TRUE)
   grd
   set.seed(1)
-  pts <- spsample(soilsph, 200, "random")
-  smple <- SpatialPointsDataFrame(pts, data=over(pts, soilsph))
+  pts <- spsample(elevation, 200, "random")
+  smple <- SpatialPointsDataFrame(pts, data=over(pts, elevation))
   summary(smple)
   writeVECT(smple, "sp_dem", v.in.ogr_flags="overwrite", ignore.stderr=TRUE)
-  bugsDF <- readVECT("bugsites", ignore.stderr=TRUE, mapset="PERMANENT")
+  bugsDF <- readVECT("schools", ignore.stderr=TRUE, mapset="PERMANENT")
   summary(bugsDF)
   vInfo("streams", ignore.stderr=TRUE)
   vColumns("streams", ignore.stderr=TRUE)
   vDataCount("streams", ignore.stderr=TRUE)
-  streams <- readVECT("streams", type="line,boundary",
+  streams <- readVECT("streams", type="line",
     remove.duplicates=FALSE, ignore.stderr=TRUE, plugin=FALSE)
   summary(streams)
 }

@@ -58,12 +58,12 @@ if (nchar(Sys.getenv("GISRC")) > 0) {
   print(parseGRASS("r.slope.aspect"))
   doGRASS("r.slope.aspect", flags=c("overwrite"),
     elevation="elevation.dem", slope="slope", aspect="aspect")
-  pars <- list(elevation="elevation.dem", slope="slope", aspect="aspect")
+  pars <- list(elevation="elevation", slope="slope", aspect="aspect")
   doGRASS("r.slope.aspect", flags=c("overwrite"), parameters=pars)
   print(parseGRASS("r.buffer"))
-  doGRASS("r.buffer", flags=c("overwrite"), input="bugsites", output="bmap",
+  doGRASS("r.buffer", flags=c("overwrite"), input="schools", output="bmap",
     distances=seq(1000,15000,1000))
-  pars <- list(input="bugsites", output="bmap", distances=seq(1000,15000,1000))
+  pars <- list(input="schools", output="bmap", distances=seq(1000,15000,1000))
   doGRASS("r.buffer", flags=c("overwrite"), parameters=pars)
   set.echoCmdOption(oechoCmd)
   try(res <- execGRASS("r.stats", input = "fire_blocksgg", # no such file
