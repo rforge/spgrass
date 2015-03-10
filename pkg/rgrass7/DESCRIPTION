@@ -1,6 +1,6 @@
 Package: rgrass7
 Version: 0.1-0
-Date: 2015-01-15
+Date: 2015-03-11
 Title: Interface between GRASS 7 Geographical Information System and R
 Authors@R: c(
 	person("Roger", "Bivand", role = c("cre", "aut"), email = "Roger.Bivand@nhh.no"),
@@ -18,3 +18,4 @@ SystemRequirements: GRASS (>= 7)
 License: GPL (>= 2)
 URL: http://grass.osgeo.org/
 Collate: AAA.R options.R rgrass.R bin_link.R vect_link.R initGRASS.R xml1.R
+
