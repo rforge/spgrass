@@ -1,10 +1,10 @@
-% Copyright (C) 2005-2012 Roger S. Bivand
+% Copyright (C) 2005-2015 Roger S. Bivand
 \name{readRAST}
 \alias{readRAST}
 \alias{writeRAST}
 \title{Read and write GRASS 7 raster files}
 \description{
-Read GRASS 7 raster files from GRASS 7 into R SpatialGridDataFrame objects, and write single columns of R SpatialGridDataFrame objects to GRASS 7. \code{readRAST} and \code{writeRAST} use temporary binary files and r.out.bin and r.in.bin rather than the temporary ASCII files used in earlier implementations. The earlier versions may still be used in a transition period. 
+Read GRASS 7 raster files from GRASS 7 into R SpatialGridDataFrame objects, and write single columns of R SpatialGridDataFrame objects to GRASS 7. \code{readRAST} and \code{writeRAST} use temporary binary files and r.out.bin and r.in.bin for speed reasons. 
 }
 
 
@@ -26,7 +26,7 @@ writeRAST(x, vname, zcol = 1, NODATA=NULL,
   \item{plugin}{default taking the value set by \code{set.pluginOption};
     NULL does auto-detection, changes to FALSE if vname is longer than 1, and a sanity check will be run on raster and current region, and the function will revert to FALSE if mismatch is found; if TRUE, the plugin is available and the raster should be read in its original region and resolution; if the plugin is used, no further arguments other than mapset are respected}
   \item{mapset}{default NULL, if plugin is TRUE, the mapset of the file to be imported will be autodetected; if not NULL and if plugin is TRUE, a character string overriding the autodetected mapset, otherwise ignored}
-  \item{useGDAL}{default taking the value set by \code{set.useGDALOption}; use r.out.gdal or plugin and \code{readGDAL} if autodetected or plugin=TRUE; or for writing \code{writeGDAL}, GTiff, and r.in.gdal, if FALSE using r.out.bin or r.in.bin}
+  \item{useGDAL}{(effectively defunct, only applies to use of plugin) default taking the value set by \code{set.useGDALOption}; use plugin and \code{readGDAL} if autodetected or plugin=TRUE; or for writing \code{writeGDAL}, GTiff, and r.in.gdal, if FALSE using r.out.bin or r.in.bin}
   \item{close_OK}{default TRUE - clean up possible open connections used for reading metadata; may be set to FALSE to avoid the side-effect of other user-opened connections being broken}
   \item{drivername}{default \code{"GTiff"}; a valid GDAL writable driver name to define the file format for intermediate files}
   \item{driverFileExt}{default NULL; otherwise string value of required driver file name extension}
