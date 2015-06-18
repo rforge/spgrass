@@ -33,7 +33,7 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = get.ignore.stderrOption(),
                 if (is.null(plugin)) plugin <- "GRASS" %in% gdalD
                 if (length(vname) > 1) plugin <- FALSE
                 if (plugin) {
-                    resa <- .read_rast_plugin(vname, mapset=NULL, ignore.stderr=ignore.stderr)
+                    resa <- .read_rast_plugin(vname, mapset=mapset, ignore.stderr=ignore.stderr)
                 } else {
                     resa <- .read_rast_non_plugin(vname=vname, NODATA=NODATA,
                                                   driverFileExt=driverFileExt, ignore.stderr=ignore.stderr, return_SGDF=return_SGDF, cat=cat)

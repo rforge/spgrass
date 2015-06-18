@@ -29,7 +29,7 @@ readVECT <- function(vname, layer, type=NULL, plugin=get.pluginOption(),
             sss <- strsplit(packageDescription("rgdal")$Version, "-")[[1]]
             if (plugin) {
                 res <- .read_vect_plugin(vname=vname, layer=layer, type=type, sss=sss,
-                                         ignore.stderr=ignore.stderr, pointDropZ=pointDropZ)
+                                         ignore.stderr=ignore.stderr, pointDropZ=pointDropZ, mapset = mapset)
             } else {
                 res <- .read_vect_non_plugin(vname=vname, layer=layer, type=type, remove.duplicates=remove.duplicates, sss=sss,
                                              ignore.stderr=ignore.stderr, pointDropZ=pointDropZ,
@@ -49,7 +49,7 @@ readVECT <- function(vname, layer, type=NULL, plugin=get.pluginOption(),
 
 ## internal function for reading vectors via plugin
 
-.read_vect_plugin <- function(vname, layer, type, sss, ignore.stderr, pointDropZ) {
+.read_vect_plugin <- function(vname, layer, type, sss, ignore.stderr, pointDropZ, mapset) {
     ogrD <- rgdal::ogrDrivers()$name
 	if (!("GRASS" %in% ogrD)) stop("no GRASS plugin driver")
         gg <- gmeta()
