@@ -1,5 +1,5 @@
 # Interpreted GRASS 7 interface functions
-# Copyright (c) 20015 Roger S. Bivand
+# Copyright (c) 2015 Roger S. Bivand
 #
 readVECT <- function(vname, layer, type=NULL, plugin=get.pluginOption(),
         remove.duplicates=TRUE, 
@@ -109,9 +109,12 @@ readVECT <- function(vname, layer, type=NULL, plugin=get.pluginOption(),
                       system(paste("cygpath -w", gtmpfl1, sep=" "), intern=TRUE), 
                       gtmpfl1)
 
-    if (driver == "ESRI Shapefile") 
+    if (driver == "ESRI Shapefile") {
         shname <- substring(vname, 1, ifelse(nchar(vname) > 8, 8, 
                                              nchar(vname)))
+    } else {
+        shname <- vname
+    }
     
     flags <- NULL
     if (with_prj) flags <- "e"
