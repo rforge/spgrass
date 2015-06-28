@@ -1,5 +1,8 @@
 import(sp)
 import(XML)
+importFrom(utils, packageDescription, read.table)
+importFrom(stats, runif, na.omit)
+importFrom(methods, slot, as)
 #import(rgdal)
 
 export(gmeta, getLocationProj, gmeta2grd, gmeta6)

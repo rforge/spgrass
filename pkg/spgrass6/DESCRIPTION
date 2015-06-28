@@ -1,7 +1,7 @@
 Package: spgrass6
-Version: 0.8-7
-Date: 2015-01-30
-Title: Interface between GRASS 6+ Geographical Information System and R
+Version: 0.8-8
+Date: 2015-06-28
+Title: Interface Between GRASS 6+ Geographical Information System and R
 Authors@R: c(
 	person("Roger", "Bivand", role = c("cre", "aut"), email = "Roger.Bivand@nhh.no"),
 	person("Rainer", "Krug", role = "ctb", email="Rainer@krugs.de"),
@@ -13,6 +13,7 @@ Description: Interpreted interface between GRASS 6+ geographical
     R command line. This package may not be used for GRASS 7, for which
     spgrass7 should be used.
 Depends: R (>= 2.12), sp (>= 0.9), XML
+Imports: stats, utils, methods
 Suggests: rgdal (>= 0.8-8)
 SystemRequirements: GRASS (>= 6.3, < 7)
 License: GPL (>= 2)
