@@ -18,7 +18,8 @@ readVECT(vname, layer, type=NULL, plugin=get.pluginOption(),
  with_prj=TRUE, with_c=FALSE, mapset=NULL,
  pointDropZ=FALSE, driver="ESRI Shapefile")
 writeVECT(SDF, vname,  v.in.ogr_flags=NULL,
- ignore.stderr = get.ignore.stderrOption(), driver="ESRI Shapefile")
+ ignore.stderr = get.ignore.stderrOption(), driver="ESRI Shapefile",
+ min_area=0.0001, snap=-1)
 vInfo(vname, layer, ignore.stderr = NULL)
 vColumns(vname, layer, ignore.stderr = NULL)
 vDataCount(vname, layer, ignore.stderr = NULL)
@@ -39,6 +40,8 @@ vect2neigh(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE, vname2=NULL,
   \item{mapset}{if plugin is TRUE, the mapset of the file to be imported may be changed from the current mapset by passing a character string}
   \item{pointDropZ}{default FALSE, if TRUE, discard third coordinates for point geometries; third coordinates are alway discarded for line and polygon geometries}
   \item{driver}{default \code{"ESRI Shapefile"}; a valid OGR writable driver name to define the file format for intermediate files, one of \code{c("GML", "SQLite"), c("ESRI_Shapefile", "MapInfo_File")}}
+  \item{min_area}{default 0.0001); Minimum size of area to be imported (square meters) Smaller areas and islands are ignored. Should be greater than snap^2}
+  \item{snap}{default -1); Snapping threshold for boundaries (map units). '-1' for no snap}
   \item{SDF}{A Spatial*DataFrame to be moved to GRASS 7 as a vector object, for SpatialPointsDataFrame, SpatialLinesDataFrame, and SpatialPolygonsDataFrame objects}
   \item{v.in.ogr_flags}{Character vector containing additional optional flags and/or options for v.in.ogr, particularly "o" and "overwrite"}
   \item{ID}{A valid DB column name for unique identifiers (optional)}
@@ -78,6 +81,8 @@ if (nchar(Sys.getenv("GISRC")) > 0 &&
   print(vInfo("roadsmajor"))
   roads <- readVECT("roadsmajor")
   print(summary(roads))
+  cen_neig <- vect2neigh("census")
+  str(cen_neig)
   Sys.setenv("GRASS_VERBOSE"=GV)
   set.ignore.stderrOption(ois)
 }

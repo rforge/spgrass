@@ -131,7 +131,7 @@ readVECT <- function(vname, layer, type=NULL, plugin=get.pluginOption(),
     tryCatch(
         {
             execGRASS("v.out.ogr", flags=flags, input=vname,
-                      type=type, layer=layer, output=GDSN, output_layer=LAYER,
+                      type=type, layer=as.character(layer), output=GDSN, output_layer=LAYER,
                       format=gsub(" ", "_", driver), ignore.stderr=ignore.stderr)
 
             if (sss[1] >= "0." && as.integer(sss[2]) > 7) {
@@ -260,7 +260,8 @@ readVECT <- function(vname, layer, type=NULL, plugin=get.pluginOption(),
 }
 
 writeVECT <- function(SDF, vname, #factor2char = TRUE, 
-                      v.in.ogr_flags=NULL, ignore.stderr = get.ignore.stderrOption(), driver="ESRI Shapefile") {
+     v.in.ogr_flags=NULL, ignore.stderr = get.ignore.stderrOption(),
+     driver="ESRI Shapefile", min_area=0.0001, snap=-1) {
 
     if (get.suppressEchoCmdInFuncOption()) {
         inEchoCmd <- set.echoCmdOption(FALSE)
@@ -275,7 +276,7 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
             if (!(driver %in% ogrD))
                 stop(paste("Requested driver", driver, "not available in rgdal"))
             ogrDGRASS <- execGRASS("v.in.ogr", flags="f", intern=TRUE,
-                                   ignore.stderr=ignore.stderr)
+                ignore.stderr=ignore.stderr, min_area=min_area, snap=snap)
             ogrDGRASSs <- strsplit(ogrDGRASS, ": ")
             if (!(driver %in% sapply(ogrDGRASSs, "[", 2)))
                 stop(paste("Requested driver", driver, "not available in GRASS"))
@@ -320,7 +321,7 @@ writeVECT <- function(SDF, vname, #factor2char = TRUE,
                     
                     
                     execGRASS("v.in.ogr", flags=v.in.ogr_flags,
-                              input=GDSN, output=vname, layer=LAYER,
+                              input=GDSN, output=vname, layer=as.character(LAYER),
                               ignore.stderr=ignore.stderr)
                 },
                 finally = {
@@ -399,7 +400,7 @@ vDataCount <- function(vname, layer, ignore.stderr = NULL) {
         column <- "column" %in% parseGRASS("v.db.select")$pnames
         if (missing(layer)) layer <- 1L
         layer <- as.character(layer)
-        parms <- list(map=vname, layer=layer, columns="cat")
+        parms <- list(map=vname, layer=as.character(layer), columns="cat")
         if (column) tull <- execGRASS("v.db.select", flags="c",
             parameters=parms, intern=TRUE, ignore.stderr=ignore.stderr)
         else tull <- execGRASS("v.db.select", flags="c",
@@ -529,7 +530,7 @@ vect2neigh <- function(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE,
 #                    " vect=", vname, ",", vname2, sep="")
 #	if(.Platform$OS.type == "windows") tull <- system(cmd, intern=TRUE)
 #	else tull <- system(cmd, intern=TRUE, ignore.stderr=ignore.stderr)
-        tull <- execGRASS("g.copy", vect=paste(vname, 
+        tull <- execGRASS("g.copy", vector=paste(vname, 
             vname2, sep=","), intern=TRUE, ignore.stderr=ignore.stderr)
         vname2_was_null <- TRUE
     }
@@ -541,8 +542,8 @@ vect2neigh <- function(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE,
 #	if(.Platform$OS.type == "windows") tull <- system(cmd, intern=TRUE)
 #	else tull <- system(cmd, intern=TRUE, ignore.stderr=ignore.stderr)
         tull <- execGRASS("v.category", input=vname2,
-                output=vname2a, layer=as.integer(2), type="boundary",
-                option="add", intern=TRUE, ignore.stderr=ignore.stderr)
+                output=vname2a, layer=as.character(2), type="boundary",
+                option="add", flags="overwrite", intern=TRUE, ignore.stderr=ignore.stderr)
 
 #	cmd <- paste(paste("v.db.addtable", .addexe(), sep=""),
 #                    " ", vname2a, 
@@ -578,7 +579,7 @@ vect2neigh <- function(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE,
 #	if(.Platform$OS.type == "windows") system(cmd)
 #	else system(cmd, ignore.stderr=ignore.stderr)
         execGRASS("v.to.db", map=vname2a, option="sides",
-                columns="left,right", layer=as.integer(2),
+                columns="left,right", layer=as.character(2),
                 ignore.stderr=ignore.stderr)
 
 #	cmd <- paste(paste("v.to.db", .addexe(), sep=""),
@@ -587,7 +588,7 @@ vect2neigh <- function(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE,
 #	if(.Platform$OS.type == "windows") system(cmd)
 #	else system(cmd, ignore.stderr=ignore.stderr)
         execGRASS("v.to.db", map=vname2a, option="length",
-                columns="length", layer=as.integer(2), units=units,
+                columns="length", layer=as.character(2), units=units,
                 ignore.stderr=ignore.stderr)
 
 #	cmd <- paste(paste("v.db.select", .addexe(), sep=""),
@@ -597,14 +598,15 @@ vect2neigh <- function(vname, ID=NULL, ignore.stderr = NULL, remove=TRUE,
 #	else res <- system(cmd, intern=TRUE, ignore.stderr=ignore.stderr)
     }
     res <- execGRASS("v.db.select", map=vname2a,
-                layer=as.integer(2), intern=TRUE, ignore.stderr=ignore.stderr)
+          layer=as.character(2), flags="overwrite", intern=TRUE,
+          ignore.stderr=ignore.stderr)
 
 #	cmd <- paste(paste("g.remove", .addexe(), sep=""),
 #                    " vect=", vname2, ",", vname2a, sep="")
 #	if(.Platform$OS.type == "windows") tull <- system(cmd, intern=TRUE)
 #	else tull <- system(cmd, intern=TRUE, ignore.stderr=ignore.stderr)
     if (remove) tull <- execGRASS("g.remove",
-            vect=paste(vname2, vname2a, sep=","),
+            name=paste(vname2, vname2a, sep=","), type="vector",
             intern=TRUE, ignore.stderr=ignore.stderr)
 
     con <- textConnection(res)
