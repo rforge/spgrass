@@ -206,7 +206,7 @@ readRAST <- function(vname, cat=NULL, ignore.stderr = get.ignore.stderrOption(),
 				}
                                 if (length(catlabs) > length(unique(catlabs))) {
                                     catlabs <- paste(catlabs, catnos, sep="_")
-                                    warning("non-unique factor labels")
+                                    warning("non-unique category labels; category number appended")
                                 }
 				resa@data[[i]] <- factor(resa@data[[i]], 
 					levels=catnos, labels=catlabs)
