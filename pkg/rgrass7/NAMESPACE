@@ -2,7 +2,7 @@ import(sp)
 import(XML)
 importFrom(utils, packageDescription, read.table)
 importFrom(stats, runif, na.omit)
-importFrom(methods, slot, as)
+importFrom(methods, slot, "slot<-", as)
 
 export(gmeta, getLocationProj, gmeta2grd)
 export(execGRASS, doGRASS, parseGRASS, getXMLencoding, setXMLencoding)
