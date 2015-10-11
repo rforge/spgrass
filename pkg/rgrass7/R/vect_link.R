@@ -138,6 +138,15 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
         shname <- vname
         fieldNameFix <- FALSE
     }
+    if (fieldNameFix) {
+        dc <- execGRASS("db.connect", flags="p", intern=TRUE,
+            ignore.stderr=ignore.stderr)
+        dbDriver <- strsplit(dc[grep("driver:", dc)], " ")[[1]][2]
+        if (dbDriver != "sqlite") {
+            fieldNameFix <- FALSE
+            warning("readVECT: db driver not sqlite - no long field/column name fix available")
+        }
+    }
     
     flags <- "overwrite"
     if (with_prj) flags <- c(flags, "e")
