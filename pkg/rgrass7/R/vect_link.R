@@ -519,9 +519,11 @@ vColumns <- function(vname, layer, ignore.stderr = NULL) {
         layer <- as.character(layer)
 	vinfo0 <- execGRASS("v.info", flags="c", map=vname,
             layer=layer, intern=TRUE, ignore.stderr=ignore.stderr)       
-	con <- textConnection(vinfo0)
-        res <- read.table(con, header=FALSE, sep="|")
-	close(con)
+        vinfo1 <- strsplit(vinfo0, "\\|")
+        vinfo2 <- vinfo1[sapply(vinfo1, length) == 2]
+        if (length(vinfo1) != length(vinfo2))
+            warning("vColumns: v.info -c output not all in two columns")
+        res <- as.data.frame(do.call("rbind", vinfo2))
 	names(res) <- c("storageType", "name")
         if (get.suppressEchoCmdInFuncOption()) {
             tull <- set.echoCmdOption(inEchoCmd)
