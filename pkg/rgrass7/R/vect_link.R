@@ -531,7 +531,8 @@ vColumns <- function(vname, layer, ignore.stderr = NULL) {
         vinfo1 <- strsplit(vinfo0, "\\|")
         vinfo2 <- vinfo1[sapply(vinfo1, length) == 2]
         if (length(vinfo1) != length(vinfo2))
-            warning("vColumns: v.info -c output not all in two columns")
+            warning("vColumns: v.info -c output not in two columns:\n",
+                paste(vinfo1[sapply(vinfo1, length) != 2]))
         res <- as.data.frame(do.call("rbind", vinfo2))
 	names(res) <- c("storageType", "name")
         if (get.suppressEchoCmdInFuncOption()) {
