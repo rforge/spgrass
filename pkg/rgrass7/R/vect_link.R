@@ -17,7 +17,7 @@ readVECT <- function(vname, layer, type=NULL, plugin=NULL,
         {
             stopifnot(is.logical(plugin)|| is.null(plugin))
             stopifnot(is.logical(ignore.stderr))
-            if (missing(layer)) layer <- 1L
+            if (missing(layer)) layer <- "1"
             layer <- as.character(layer)
 # 120908 emails Markus Neteler, Markus Metz, default TRUE before G7
             stopifnot(is.logical(with_c))
@@ -498,7 +498,7 @@ vInfo <- function(vname, layer, ignore.stderr = NULL) {
             ignore.stderr <- get("ignore.stderr", envir = .GRASS_CACHE)
         stopifnot(is.logical(ignore.stderr))
 
-        if (missing(layer)) layer <- 1L
+        if (missing(layer)) layer <- "1"
         layer <- as.character(layer)
 	vinfo0 <- execGRASS("v.info", flags="t", map=vname,
             layer=layer, intern=TRUE, ignore.stderr=ignore.stderr)
@@ -524,7 +524,7 @@ vColumns <- function(vname, layer, ignore.stderr = NULL) {
         if (is.null(ignore.stderr))
             ignore.stderr <- get("ignore.stderr", envir = .GRASS_CACHE)
         stopifnot(is.logical(ignore.stderr))
-        if (missing(layer)) layer <- 1L
+        if (missing(layer)) layer <- "1"
         layer <- as.character(layer)
 	vinfo0 <- execGRASS("v.info", flags="c", map=vname,
             layer=layer, intern=TRUE, ignore.stderr=ignore.stderr)       
@@ -550,7 +550,7 @@ vDataCount <- function(vname, layer, ignore.stderr = NULL) {
             ignore.stderr <- get("ignore.stderr", envir = .GRASS_CACHE)
         stopifnot(is.logical(ignore.stderr))
         column <- "column" %in% parseGRASS("v.db.select")$pnames
-        if (missing(layer)) layer <- 1L
+        if (missing(layer)) layer <- "1"
         layer <- as.character(layer)
         parms <- list(map=vname, layer=as.character(layer), columns="cat")
         if (column) tull <- execGRASS("v.db.select", flags="c",
