@@ -11,7 +11,7 @@ parseGRASS <- function(cmd, legacyExec=NULL) {
     if (is.null(res)) {
         ext <- get("addEXE", envir=.GRASS_CACHE)
         WN_bat <- get("WN_bat", envir=.GRASS_CACHE)
-        if (get("SYS", envir=.GRASS_CACHE) == "WinNat" && nchar(WN_bat)) {
+        if (get("SYS", envir=.GRASS_CACHE) == "WinNat" && nchar(WN_bat) == 0) {
             WN_bat <- sub(".bat", "", 
                 list.files(paste(Sys.getenv("GISBASE"), "bin", sep="/"),
                 pattern=".bat$"))
