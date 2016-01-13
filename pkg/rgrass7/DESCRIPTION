@@ -1,6 +1,6 @@
 Package: rgrass7
-Version: 0.1-4
-Date: 2016-01-11
+Version: 0.1-5
+Date: 2016-01-13
 Title: Interface Between GRASS 7 Geographical Information System and R
 Authors@R: c(
 	person("Roger", "Bivand", role = c("cre", "aut"), email = "Roger.Bivand@nhh.no"),
