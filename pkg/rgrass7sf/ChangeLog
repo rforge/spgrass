@@ -1,0 +1,9 @@
+2016-12-15 13:46  rsbivand
+
+	* ., .Rbuildignore, ChangeLog, DESCRIPTION, NAMESPACE, R, R/AAA.R,
+	  R/bin_link.R, R/initGRASS.R, R/options.R, R/rgrass.R,
+	  R/vect_link.R, R/xml1.R, inst, inst/ChangeLog, man,
+	  man/execGRASS.Rd, man/gmeta.Rd, man/initGRASS.Rd,
+	  man/readRAST.Rd, man/readVECT.Rd, man/rgrass.Rd, oChangeLog,
+	  svn2cl.xsl: begin rgrass7sf
+
