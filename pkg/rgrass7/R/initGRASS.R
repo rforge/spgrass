@@ -42,6 +42,15 @@ initGRASS <- function(gisBase, home, SG, gisDbase, addon_base, location,
     stopifnot(length(remove_GISRC) == 1)
 
     if (!file.exists(gisBase)) stop(paste(gisBase, "not found"))
+    if (!file.info(gisBase)$isdir[1]) stop(gisBase, " is not a directory")
+    bin_is_dir <- file.info(file.path(gisBase, "bin"))$isdir[1]
+    if (is.na(bin_is_dir)) 
+      stop(gisBase, " does not contain bin, the directory with GRASS programs")
+    if (!bin_is_dir) stop(gisBase, "/bin is not a directory")
+    scripts_is_dir <- file.info(file.path(gisBase, "scripts"))$isdir[1]
+    if (is.na(scripts_is_dir)) 
+      stop(gisBase, " does not contain scripts, the directory with GRASS scripts")
+    if (!scripts_is_dir) stop(gisBase, "/scripts is not a directory")
 
     SYS <- get("SYS", envir=.GRASS_CACHE) 
     if (SYS == "WinNat") {
